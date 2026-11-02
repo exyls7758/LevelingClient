@@ -185,7 +185,9 @@ namespace Multiverse.Services
             if (_disposed || _stopping || _worker is not null)
                 return;
 
-            _udp = new UdpClient(new IPEndPoint(IPAddress.Any, AudioPort));
+            IPAddress bindAddress = _expectedRemoteAddress?.AddressFamily == AddressFamily.InterNetworkV6
+                ? IPAddress.IPv6Any : IPAddress.Any;
+            _udp = new UdpClient(new IPEndPoint(bindAddress, AudioPort));
             _udp.Client.ReceiveBufferSize = 256 * 1024;
             _worker = Task.Run(() => ReceiveLoopAsync(_cancel.Token));
         }

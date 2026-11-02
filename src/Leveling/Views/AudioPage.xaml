@@ -146,6 +146,11 @@
                             </Grid>
                             <TextBlock Text="Trocar a saída não reinicia vídeo, controle ou sessão remota." Foreground="{StaticResource SecondaryText}" TextWrapping="Wrap"/>
                             <ComboBox x:Name="OutputDeviceComboBox" tips:LevelingInfoToolTip.Text="Escolhe em qual fone, caixa de som ou dispositivo do Windows o áudio remoto será reproduzido no cliente." Header="Dispositivo de saída" PlaceholderText="Padrão do Windows" SelectionChanged="OutputDeviceComboBox_SelectionChanged"/>
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                <Button x:Name="ResumeAudioButton" Content="Ouvir áudio" Click="ResumeAudioButton_Click" ui:InterfaceMotion.Enabled="True"/>
+                                <Button Content="Atualizar saídas" Click="RefreshOutputsButton_Click" ui:InterfaceMotion.Enabled="True"/>
+                            </StackPanel>
+                            <TextBlock x:Name="ClientAudioHint" FontSize="12" TextWrapping="Wrap" Foreground="{StaticResource SecondaryText}"/>
                             <Grid ColumnSpacing="12">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="Auto"/>

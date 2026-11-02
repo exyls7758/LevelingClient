@@ -12,10 +12,13 @@ namespace Multiverse.Views
     {
         private readonly RemoteAudioService _audio = RemoteAudioService.Instance;
         private bool _updatingUi;
+        private bool _audioActionPending;
+        private readonly DispatcherTimer _statusTimer = new() { Interval = TimeSpan.FromSeconds(1) };
 
         public AudioPage()
         {
             InitializeComponent();
+            _statusTimer.Tick += (_, _) => SafeUpdateUi();
             Loaded += AudioPage_Loaded;
             Unloaded += AudioPage_Unloaded;
         }
@@ -25,11 +28,13 @@ namespace Multiverse.Views
             FriendRequestPromptCoordinator.Instance.Attach(this);
             _audio.AudioChanged += Audio_AudioChanged;
             SafeRefreshAll();
+            _statusTimer.Start();
         }
 
         private void AudioPage_Unloaded(object sender, RoutedEventArgs e)
         {
             _audio.AudioChanged -= Audio_AudioChanged;
+            _statusTimer.Stop();
             FriendRequestPromptCoordinator.Instance.Detach(this);
         }
 
@@ -127,14 +132,20 @@ namespace Multiverse.Views
                 VolumeSlider.Value = snapshot.ClientVolumePercent;
                 VolumeValueText.Text = $"{snapshot.ClientVolumePercent}%";
                 bool automatic = snapshot.CaptureMode == AudioCaptureMode.AutomaticGamesAndMedia;
-                HostAudioButton.IsEnabled = !automatic;
-                HostAudioButton.Content = automatic
-                    ? snapshot.HostCaptureRunning
-                        ? "Automático ativo • acompanha transmissão"
-                        : "Automático • acompanha transmissão"
-                    : snapshot.HostCaptureRunning
-                        ? "Parar áudio do host"
-                        : "Iniciar áudio";
+                var session = RemoteSessionService.Instance.GetSnapshot();
+                bool client = session.Connected && session.Role == RemoteSessionRole.Client;
+                HostAudioButton.IsEnabled = !_audioActionPending && session.Connected && session.Role == RemoteSessionRole.Host;
+                ResumeAudioButton.IsEnabled = !_audioActionPending && client && session.StreamConfig is not null;
+                ResumeAudioButton.Content = snapshot.ClientPlaybackRunning ? "Reconectar saída" : "Ouvir áudio";
+                StopAudioButton.IsEnabled = !_audioActionPending && (snapshot.HostCaptureRunning || snapshot.ClientPlaybackRunning);
+                CaptureModeComboBox.IsEnabled = !client && !_audioActionPending;
+                ProcessComboBox.IsEnabled = !client && !_audioActionPending;
+                ClientAudioHint.Text = client
+                    ? snapshot.ClientVolumePercent == 0 ? "Volume em zero: o áudio está silenciado." : "O som recebido será reproduzido na saída escolhida neste PC."
+                    : "Estas opções ajustam o som quando este PC recebe uma transmissão.";
+                HostAudioButton.Content = snapshot.HostCaptureRunning
+                    ? "Parar áudio do host"
+                    : automatic ? "Iniciar áudio automático" : "Iniciar áudio";
                 AudioStatusText.Text = string.IsNullOrWhiteSpace(snapshot.StatusText)
                     ? "Áudio parado"
                     : snapshot.StatusText;
@@ -274,6 +285,8 @@ namespace Multiverse.Views
 
         private async void HostAudioButton_Click(object sender, RoutedEventArgs e)
         {
+            if (_audioActionPending) return;
+            _audioActionPending = true;
             try
             {
                 HostAudioButton.IsEnabled = false;
@@ -289,9 +302,26 @@ namespace Multiverse.Views
             }
             finally
             {
-                HostAudioButton.IsEnabled = true;
+                _audioActionPending = false;
                 SafeUpdateUi();
             }
+        }
+
+        private async void ResumeAudioButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (_audioActionPending) return;
+            _audioActionPending = true;
+            SafeUpdateUi();
+            try { await _audio.ResumeClientPlaybackAsync(); }
+            catch (Exception ex) { ShowPageError(ex); }
+            finally { _audioActionPending = false; SafeUpdateUi(); }
+        }
+
+        private void RefreshOutputsButton_Click(object sender, RoutedEventArgs e)
+        {
+            try { _updatingUi = true; RefreshOutputs(); }
+            catch (Exception ex) { ShowPageError(ex); }
+            finally { _updatingUi = false; }
         }
 
         private void RefreshProcessesButton_Click(object sender, RoutedEventArgs e)

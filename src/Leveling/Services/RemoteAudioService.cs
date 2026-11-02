@@ -112,7 +112,6 @@ namespace Multiverse.Services
         private uint _txSequence;
         private uint _lastRxSequence;
         private bool _haveRxSequence;
-        private long _sentPackets;
         private long _receivedPackets;
         private long _droppedPackets;
         private string _lastError = "";
@@ -168,7 +167,7 @@ namespace Multiverse.Services
                 return new RemoteAudioSnapshot
                 {
                     HostCaptureRunning = ((_capture?.Running == true) || (_automaticMixer?.Running == true)) && _sender is not null,
-                    ClientPlaybackRunning = _receiver is not null && _playback is not null,
+                    ClientPlaybackRunning = _receiver is not null && _playback?.PlaybackState == PlaybackState.Playing,
                     SelectedProcessId = _selectedProcessId,
                     SelectedProcessName = _selectedProcessName,
                     SelectedOutputDeviceId = _selectedOutputDeviceId,
@@ -181,7 +180,7 @@ namespace Multiverse.Services
                     VoicePrivacyBlockedSources = _automaticMixer?.VoicePrivacyBlockedSources ?? 0,
                     VoicePrivacyStatus = _automaticMixer?.VoicePrivacyStatus ?? "Privacidade de voz automática inativa.",
                     VoicePrivacyError = _automaticMixer?.VoicePrivacyError ?? "",
-                    SentPackets = _sentPackets,
+                    SentPackets = _sender?.SentPackets ?? 0,
                     ReceivedPackets = _receivedPackets,
                     DroppedPackets = _droppedPackets,
                     BufferedMs = bufferedMs,
@@ -755,9 +754,7 @@ namespace Multiverse.Services
                                     SamplesPerChannel = FrameSamplesPerChannel,
                                     Payload = payload
                                 });
-                                if (queued)
-                                    Interlocked.Increment(ref _sentPackets);
-                                else
+                                if (!queued)
                                     Interlocked.Increment(ref _droppedPackets);
                             }
                             filled = 0;
@@ -950,7 +947,11 @@ namespace Multiverse.Services
                 lock (_sync)
                 {
                     if (generation == _playbackGeneration)
+                    {
+                        if (_lastError.StartsWith("Um pacote de áudio remoto não pôde ser reproduzido.", StringComparison.Ordinal))
+                            _lastError = "";
                         _statusText = $"Recebendo áudio • buffer {GetBufferedMs(buffer):0} ms";
+                    }
                 }
             }
             catch (Exception ex)
@@ -1044,7 +1045,10 @@ namespace Multiverse.Services
             {
                 try
                 {
-                    return enumerator.GetDevice(selectedId);
+                    MMDevice selected = enumerator.GetDevice(selectedId);
+                    if (selected.State == DeviceState.Active)
+                        return selected;
+                    selected.Dispose();
                 }
                 catch
                 {
@@ -1138,6 +1142,22 @@ namespace Multiverse.Services
             {
                 _playbackGate.Release();
             }
+        }
+
+        public async Task ResumeClientPlaybackAsync()
+        {
+            RemoteSessionSnapshot session = _session.GetSnapshot();
+            if (!session.Connected || session.Role != RemoteSessionRole.Client || session.StreamConfig is null)
+            {
+                SetError("Conecte ao host e aguarde a transmissão para ouvir o áudio.");
+                return;
+            }
+            // An existing receiver keeps its decoder/sequence; only the output is
+            // reopened. A stopped receiver is recreated through the normal gate.
+            bool running;
+            lock (_sync) running = _receiver is not null;
+            if (running) await SwitchClientOutputAsync();
+            else await StartClientPlaybackAsync();
         }
 
         private static double GetBufferedMs(BufferedWaveProvider buffer)

@@ -1,6 +1,8 @@
-# Leveling 11.75.1 RC4
+# Leveling 11.75.1 RC5
 
-- A apresentação lenta no Windows deixa de segurar o bloqueio necessário para copiar os próximos quadros decodificados.
-- Recuperação da fila passa a sinalizar a descontinuidade antes do primeiro quadro após o descarte, incluindo recuperações ocorridas durante a decodificação.
-- Testes de apresentação bloqueada, restauração do bloqueio após erro e ordenação da recuperação.
-- Mantidos os perfis de qualidade, bitrate, FEC e interface. Candidata para validar novamente no cliente; 90/120 FPS pela internet ainda não garantidos.
+- Corrige recepção de áudio em conexões IPv6, com regressão UDP IPv4/IPv6 e ciclos de parar/iniciar.
+- Saída salva inativa passa a usar a saída padrão do Windows.
+- Aba Áudio atualiza status e contadores enquanto aberta; envio conta pacotes efetivamente enviados.
+- Adiciona Ouvir áudio / Reconectar saída no cliente e atualização da lista de dispositivos.
+- Permite retomar áudio automático sem reiniciar vídeo e evita reativar o botão durante uma abertura pendente.
+- Reprodução audível em dois PCs, remoção física de fones e qualidade sonora não foram validadas nesta revisão.
