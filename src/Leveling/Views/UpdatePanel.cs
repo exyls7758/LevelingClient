@@ -31,6 +31,8 @@ public sealed class UpdatePanel : UserControl {
     void Render() {
         versions.Text="Atual: "+BuildInfo.DisplayVersion+(service.Offer is null?"":"  →  Nova: "+service.Offer.Version);
         status.Text=service.Status;notes.Text=service.Offer?.Notes ?? "";
+        notes.Visibility=string.IsNullOrWhiteSpace(notes.Text)?Visibility.Collapsed:Visibility.Visible;
+        transfer.Visibility=service.Offer is null?Visibility.Collapsed:Visibility.Visible;
         progress.Value=service.Percent;
         progress.Visibility=service.Busy && service.Offer is not null?Visibility.Visible:Visibility.Collapsed;
         transfer.Text=service.Offer is null?"":service.Busy ? $"{service.Percent}% • ~{service.BytesPerSecond/1048576:0.0} MB/s • {service.Offer.Size/1048576.0:0.0} MB" : $"Download: {service.Offer.Size/1048576.0:0.0} MB";

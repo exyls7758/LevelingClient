@@ -9,6 +9,14 @@ namespace Multiverse.Views
     {
         private readonly MultiverseSettingsService _settings = MultiverseSettingsService.Instance;
         private bool _loading;
+        private bool _showUpdates;
+
+        public void ShowUpdates() {
+            _showUpdates = true;
+            if (IsLoaded) ScrollToUpdates();
+        }
+        private void ScrollToUpdates() => DispatcherQueue.TryEnqueue(Microsoft.UI.Dispatching.DispatcherQueuePriority.Low,
+            () => UpdatesPanel.StartBringIntoView(new BringIntoViewOptions { AnimationDesired = true, VerticalAlignmentRatio = 1.0 }));
 
         public SettingsPage()
         {
@@ -21,6 +29,7 @@ namespace Multiverse.Views
         {
             FriendRequestPromptCoordinator.Instance.Attach(this);
             LoadFromSettings();
+            if (_showUpdates) ScrollToUpdates();
         }
 
         private void SettingsPage_Unloaded(object sender, RoutedEventArgs e) =>

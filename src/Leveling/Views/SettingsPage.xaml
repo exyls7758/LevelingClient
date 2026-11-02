@@ -312,7 +312,7 @@
                         </StackPanel>
                     </Grid>
                 </Border>
-                <Border Background="{StaticResource DesignSurface}" CornerRadius="12" Padding="20"><updates:UpdatePanel/></Border>
+                <Border Background="{StaticResource DesignSurface}" CornerRadius="12" Padding="20"><updates:UpdatePanel x:Name="UpdatesPanel"/></Border>
             </StackPanel>
         </ScrollViewer>
     </Grid>

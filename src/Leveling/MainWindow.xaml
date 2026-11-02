@@ -154,15 +154,16 @@
             </Grid>
         </Border>
         <Grid Grid.Row="1" Grid.Column="1">
-            <Border Background="Transparent" BorderBrush="{StaticResource DesignGlassEdge}" BorderThickness="0" CornerRadius="8" Margin="2,4,2,0">
+            <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/></Grid.RowDefinitions>
+            <InfoBar x:Name="UpdateNotice" Grid.Row="0" Margin="24,8,24,0" Visibility="Collapsed" Background="#FF20242C" IsOpen="False" IsClosable="True" Severity="Informational" Title="Nova atualização disponível!" Closed="UpdateNotice_Closed">
+                <InfoBar.ActionButton><Button Content="Ver atualização" Click="OpenUpdate_Click"/></InfoBar.ActionButton>
+            </InfoBar>
+            <Border Grid.Row="1" Background="Transparent" BorderBrush="{StaticResource DesignGlassEdge}" BorderThickness="0" CornerRadius="8" Margin="2,4,2,0">
                 <Frame x:Name="ContentFrame" Background="{StaticResource DesignBackground}" Margin="0,20,0,0"/>
             </Border>
         </Grid>
         <Border x:Name="ConnectionsRail" Grid.Row="1" Grid.Column="2" Background="#70141820" BorderBrush="{StaticResource DesignAccentEdge}" BorderThickness="0" CornerRadius="8" Margin="4,4,8,8">
             <ui:StudioConnections x:Name="ConnectionsPanel"/>
         </Border>
-        <InfoBar x:Name="UpdateNotice" Grid.Row="1" Grid.Column="1" VerticalAlignment="Top" Margin="24" IsOpen="False" IsClosable="True" Severity="Informational" Title="Nova atualização disponível!" Closed="UpdateNotice_Closed">
-            <InfoBar.ActionButton><Button Content="Ver atualização" Click="OpenUpdate_Click"/></InfoBar.ActionButton>
-        </InfoBar>
     </Grid>
 </Window>

@@ -57,10 +57,14 @@ namespace Multiverse
         }
         private void UpdateChanged() => DispatcherQueue.TryEnqueue(() => {
             UpdateNotice.IsOpen = LevelingUpdates.Instance.Offer is not null && !LevelingUpdates.Instance.Deferred;
+            UpdateNotice.Visibility = UpdateNotice.IsOpen ? Visibility.Visible : Visibility.Collapsed;
             UpdateNotice.Message = "Versão " + LevelingUpdates.Instance.Offer?.Version + " disponível em Configurações.";
         });
         private void UpdateNotice_Closed(InfoBar sender, InfoBarClosedEventArgs args) { if(args.Reason==InfoBarCloseReason.CloseButton) LevelingUpdates.Instance.Later(); }
-        private void OpenUpdate_Click(object sender, RoutedEventArgs e) => NavigateTo(typeof(SettingsPage), NavSettings);
+        private void OpenUpdate_Click(object sender, RoutedEventArgs e) {
+            NavigateTo(typeof(SettingsPage), NavSettings);
+            if (ContentFrame.Content is SettingsPage settings) settings.ShowUpdates();
+        }
         private void ShellSessionChanged(object? sender, EventArgs e) => DispatcherQueue.TryEnqueue(UpdateShellStatus);
         private void OpenConnections() => NavigateTo(typeof(FriendsPage), NavFriends);
         private void UpdateShellStatus()
