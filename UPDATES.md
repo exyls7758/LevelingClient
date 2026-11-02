@@ -13,6 +13,7 @@ scripts/Release.ps1 -Summary "Descrição" incrementa RC automaticamente, testa,
 Os arquivos de distribuição são Setup.exe, Portable.zip, nupkg e releases.win.json. Não substitua assets de uma versão já publicada; publique uma versão maior. Não publique diretamente a pasta publish.
 
 ## Segurança e limites
+O identificador de instalação é LevelingStream. A instalação padrão fica separada de %LOCALAPPDATA%/Leveling, onde versões anteriores guardam layouts e diagnósticos. Isso evita que a manutenção/desinstalação do programa utilize a pasta de dados existente.
 Não há certificado Authenticode configurado; Windows/SmartScreen pode avisar na primeira instalação. SHA256 protege a integridade dos pacotes, não substitui assinatura de editor. Proteja a conta GitHub e as permissões de publicação. Nenhum atualizador pode reparar um comprometimento da própria origem confiável.
 
 Atualização durante sessão/transmissão é bloqueada. Se uma sessão começar durante o download, o pacote fica pronto e aguarda nova confirmação. Falha de download mantém a versão atual; Velopack gerencia a substituição separada dos arquivos em uso. Não há promessa de rollback automático por falha lógica do aplicativo após iniciar. Para recuperação operacional, preserve a distribuição anterior e publique uma nova versão com a reversão.

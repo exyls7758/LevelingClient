@@ -8,6 +8,7 @@ try {
  $nativeExpected=(Get-Content native/manifest.json -Raw | ConvertFrom-Json).binary
  if((Get-FileHash "$PublishDirectory/Multiverse.Core.dll").Hash -ne $nativeExpected){throw 'Published native mismatch'}
  $vpk=Join-Path $PWD '.tools/vpk.exe'
- & $vpk pack --packId Leveling --packVersion $version --packDir $PublishDirectory --mainExe Leveling.exe --packTitle Leveling --icon src/Leveling/Assets/Leveling.ico --releaseNotes RELEASE_NOTES.md --outputDir $OutputDirectory
+ # Keep the installer root separate from existing %LOCALAPPDATA%/Leveling user data.
+ & $vpk pack --packId LevelingStream --packVersion $version --packDir $PublishDirectory --mainExe Leveling.exe --packTitle Leveling --icon src/Leveling/Assets/Leveling.ico --releaseNotes RELEASE_NOTES.md --outputDir $OutputDirectory
  if($LASTEXITCODE -ne 0){throw 'Velopack packaging failed'}
 } finally {Pop-Location}

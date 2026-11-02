@@ -5,8 +5,8 @@
     <TargetPlatformMinVersion>10.0.17763.0</TargetPlatformMinVersion>
     <RootNamespace>Multiverse</RootNamespace>
     <AssemblyName>Leveling</AssemblyName>
-    <Version>11.75.1-rc.1</Version>
-    <InformationalVersion>CORE 11.75.1 RC1 Updates</InformationalVersion>
+    <Version>11.75.1-rc.2</Version>
+    <InformationalVersion>Leveling 11.75.1-rc.2</InformationalVersion>
     <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
     <ApplicationIcon>Assets\Leveling.ico</ApplicationIcon>
     <ApplicationManifest>app.manifest</ApplicationManifest>
