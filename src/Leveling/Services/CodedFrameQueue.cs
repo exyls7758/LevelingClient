@@ -12,6 +12,7 @@ namespace Multiverse.Services
         private readonly Queue<T> _items = new();
         private readonly int _capacity;
         private int _maxObserved;
+        private bool _discontinuity;
 
         internal CodedFrameQueue(int capacity)
         {
@@ -45,7 +46,24 @@ namespace Multiverse.Services
             {
                 int count = _items.Count;
                 _items.Clear();
+                _discontinuity = false;
                 return count;
+            }
+        }
+        // Flush and the reset marker belong to the same queue generation.
+        internal int ClearForDiscontinuity()
+        {
+            lock (_sync) { int count = Clear(); _discontinuity = true; return count; }
+        }
+        internal bool TryDequeue([MaybeNullWhen(false)] out T item, out bool discontinuity)
+        {
+            lock (_sync)
+            {
+                discontinuity = false;
+                if (!TryDequeue(out item)) return false;
+                discontinuity = _discontinuity;
+                _discontinuity = false;
+                return true;
             }
         }
         internal void ResetMax()

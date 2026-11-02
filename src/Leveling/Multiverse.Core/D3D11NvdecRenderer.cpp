@@ -1,5 +1,6 @@
 #include "D3D11NvdecRenderer.h"
 #include "CompositionScaleMath.h"
+#include "UnlockedPresentation.h"
 
 #if defined(MULTIVERSE_NVDEC)
 
@@ -1365,7 +1366,7 @@ struct D3D11NvdecRenderer::Impl
     }
 
     HRESULT DrawSlot(
-        PlaneSlot& slot)
+        PlaneSlot& slot, std::unique_lock<std::mutex>& stateLock)
     {
         if (!SwapChain ||
             !BackBufferRtv ||
@@ -1571,10 +1572,13 @@ struct D3D11NvdecRenderer::Impl
         // signaled before DrawSlot reached this point, so submit normally.
         // Do not use DXGI_PRESENT_DO_NOT_WAIT here: that flag intentionally
         // converts compositor back-pressure into WAS_STILL_DRAWING frame loss.
-        HRESULT hr =
-            SwapChain->Present(
-                0,
-                0);
+        // Resize/detach stop and join this presenter before replacing resources.
+        // Keep the COM object alive and the slot reserved, but let NVDEC copy
+        // other slots while DXGI waits for the compositor.
+        auto presentingChain = SwapChain;
+        HRESULT hr = multiverse::InvokePresentation(stateLock, [&] {
+            return presentingChain->Present(0, 0);
+        });
 
         const auto presentCallEnd =
             Clock::now();
@@ -2015,7 +2019,7 @@ struct D3D11NvdecRenderer::Impl
                             Slots.size())
                     {
                         hr = DrawSlot(
-                            Slots[static_cast<std::size_t>(slot)]);
+                            Slots[static_cast<std::size_t>(slot)], stateLock);
                     }
                 }
 

@@ -1,9 +1,6 @@
-# Leveling 11.75.1 RC3
+# Leveling 11.75.1 RC4
 
-- Atualizações integradas: verificação ao iniciar e em Configurações.
-- Download com progresso, tamanho e velocidade estimada.
-- Instalação por processo separado e reinicialização.
-- Proteção contra atualização durante uma sessão ou transmissão.
-- Instalação em pasta própria, separada dos layouts e diagnósticos existentes.
-- Aviso de atualização sem sobrepor o conteúdo e acesso direto aos botões de atualização.
-- Preserva as correções de captura e os perfis 30/60/80/90/120 FPS da RC20.4.
+- A apresentação lenta no Windows deixa de segurar o bloqueio necessário para copiar os próximos quadros decodificados.
+- Recuperação da fila passa a sinalizar a descontinuidade antes do primeiro quadro após o descarte, incluindo recuperações ocorridas durante a decodificação.
+- Testes de apresentação bloqueada, restauração do bloqueio após erro e ordenação da recuperação.
+- Mantidos os perfis de qualidade, bitrate, FEC e interface. Candidata para validar novamente no cliente; 90/120 FPS pela internet ainda não garantidos.

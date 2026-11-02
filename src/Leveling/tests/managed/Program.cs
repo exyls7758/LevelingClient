@@ -313,6 +313,18 @@ static void IntervalTests()
 try
 {
 LeaseTests();
+var recoveryQueue = new CodedFrameQueue<int>(4);
+recoveryQueue.TryEnqueue(1);
+Check(recoveryQueue.ClearForDiscontinuity() == 1, "recovery clears old references");
+Check(!recoveryQueue.TryDequeue(out _, out _), "empty poll cannot consume recovery barrier");
+recoveryQueue.TryEnqueue(100);
+recoveryQueue.TryEnqueue(101);
+Check(recoveryQueue.TryDequeue(out var idr, out var reset) && idr == 100 && reset, "first post-flush frame carries decoder reset");
+Check(recoveryQueue.TryDequeue(out var delta, out reset) && delta == 101 && !reset, "reset cannot move after the new keyframe");
+recoveryQueue.ClearForDiscontinuity();
+recoveryQueue.Clear();
+recoveryQueue.TryEnqueue(200);
+Check(recoveryQueue.TryDequeue(out _, out reset) && !reset, "new session clears obsolete recovery state");
 ProgressTests();
 IntervalTests();
 await RecorderTests();

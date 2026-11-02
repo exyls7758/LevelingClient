@@ -137,7 +137,6 @@ namespace Multiverse.Services
         // Recovery can be requested by the UDP receive thread. The expensive
         // native parser/decoder discontinuity call is executed only by the
         // dedicated decode thread, so RX never waits on NVDEC/CUDA.
-        private int _nativeDiscontinuityPending;
 
         private string _lastError = "";
 
@@ -291,11 +290,10 @@ namespace Multiverse.Services
 
         private void RecoverFromBacklogLocked()
         {
-            int dropped = _queue.Clear();
+            int dropped = _queue.ClearForDiscontinuity();
             if (dropped > 0)
                 Interlocked.Add(ref _staleFramesDropped, dropped);
             _seenKeyFrame = false;
-            Interlocked.Exchange(ref _nativeDiscontinuityPending, 1);
         }
 
         private void RecoverFromBacklog()
@@ -345,11 +343,9 @@ namespace Multiverse.Services
             }
         }
 
-        private void ApplyPendingNativeDiscontinuity()
+        private void ApplyNativeDiscontinuity(bool pending)
         {
-            if (Interlocked.Exchange(
-                    ref _nativeDiscontinuityPending,
-                    0) == 0)
+            if (!pending)
             {
                 return;
             }
@@ -365,9 +361,9 @@ namespace Multiverse.Services
             }
         }
 
-        private bool TryDequeueFrame([MaybeNullWhen(false)] out ReassembledVideoFrame frame)
+        private bool TryDequeueFrame([MaybeNullWhen(false)] out ReassembledVideoFrame frame, out bool discontinuity)
         {
-            lock (_queueSync) return _queue.TryDequeue(out frame);
+            lock (_queueSync) return _queue.TryDequeue(out frame, out discontinuity);
         }
 
         private void DecodeLoop()
@@ -378,10 +374,9 @@ namespace Multiverse.Services
                 {
                     _wake.WaitOne(5);
 
-                    ApplyPendingNativeDiscontinuity();
-
-                    while (TryDequeueFrame(out ReassembledVideoFrame? frame) && frame is not null)
+                    while (TryDequeueFrame(out ReassembledVideoFrame? frame, out bool discontinuity) && frame is not null)
                     {
+                        ApplyNativeDiscontinuity(discontinuity);
 
                         _localQueueAge.ObserveTimestamp(
                             frame.ReceiveTimestamp, Stopwatch.GetTimestamp(), Stopwatch.Frequency);
@@ -629,7 +624,6 @@ namespace Multiverse.Services
                 _queue.ResetMax();
             }
             _localQueueAge.Reset();
-            Interlocked.Exchange(ref _nativeDiscontinuityPending, 0);
         }
 
         public void Dispose()
