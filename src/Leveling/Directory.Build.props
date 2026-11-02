@@ -1,0 +1,18 @@
+<Project>
+  <ItemGroup Condition="'$(MSBuildProjectName)' == 'Leveling'">
+    <ProjectReference Condition="'$(UsePrebuiltNative)' != 'true'"
+      Include="$(MSBuildThisFileDirectory)Multiverse.Core\Multiverse.Core.vcxproj"
+      ReferenceOutputAssembly="false"
+      AdditionalProperties="Platform=x64" />
+
+    <Content Condition="'$(UsePrebuiltNative)' != 'true'"
+      Include="$(MSBuildThisFileDirectory)Multiverse.Core\bin\x64\$(Configuration)\Multiverse.Core.dll"
+      Link="Multiverse.Core.dll"
+      CopyToOutputDirectory="PreserveNewest"
+      CopyToPublishDirectory="PreserveNewest"
+      Visible="false" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(MSBuildProjectName)' == 'Leveling' and '$(UsePrebuiltNative)' == 'true'">
+    <Content Include="$(MSBuildThisFileDirectory)..\..\native\Multiverse.Core.dll" Link="Multiverse.Core.dll" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest"/>
+  </ItemGroup>
+</Project>

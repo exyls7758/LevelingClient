@@ -1,0 +1,33 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="Program.cs" /><Compile Include="VideoGenerationIdentityTests.cs" /><Compile Include="../../Services/VideoGenerationIdentity.cs" /><Compile Include="EncoderStallDetectorTests.cs" /><Compile Include="../../Services/EncoderStallDetector.cs" /><Compile Include="ConfirmedPipelineTests.cs" /><Compile Include="../../Services/HostPipelineRecoveryTransaction.cs" />
+    <Compile Include="TransportRecoveryTests.cs" />
+    <Compile Include="../../Services/ClientTransportRecoveryPolicy.cs" Link="ClientTransportRecoveryPolicy.cs" />
+    <Compile Include="../../Services/HostSenderRecoveryPolicy.cs" Link="HostSenderRecoveryPolicy.cs" />
+    <Compile Include="ConfirmedResourceTests.cs" />
+    <Compile Include="../../Services/ConfirmedThread.cs" Link="ConfirmedThread.cs" />
+    <Compile Include="../../Services/ConfirmedResource.cs" Link="ConfirmedResource.cs" />
+    <Compile Include="../../Services/ConfirmedTask.cs" Link="ConfirmedTask.cs" />
+    <Compile Include="../../Services/BoundedLineReader.cs" Link="BoundedLineReader.cs" />
+    <Compile Include="ControlHardeningTests.cs" />
+    <Compile Include="../../Services/CodedFrameQueue.cs" Link="CodedFrameQueue.cs" />
+    <Compile Include="HostPipelineRecoveryTests.cs" />
+    <Compile Include="VideoLatencyWindowTests.cs" />
+    <Compile Include="../../Services/VideoLatencyWindow.cs" Link="VideoLatencyWindow.cs" />
+    <Compile Include="HostPipelineRecoveryCoordinatorTests.cs" />
+    <Compile Include="../../Services/HostPipelineRecoveryCoordinator.cs" Link="HostPipelineRecoveryCoordinator.cs" />
+    <Compile Include="../../Services/HostPipelineRecoveryPolicy.cs" Link="HostPipelineRecoveryPolicy.cs" />
+    <Compile Include="../../Services/ExclusivePacketConsumer.cs" Link="ExclusivePacketConsumer.cs" />
+    <Compile Include="../../Services/VideoProgressMonitor.cs" Link="VideoProgressMonitor.cs" />
+    <Compile Include="../../Services/VideoFlightRecorder.cs" Link="VideoFlightRecorder.cs" />
+    <Compile Include="../../Services/VideoFrameIntervalMeter.cs" Link="VideoFrameIntervalMeter.cs" />
+  </ItemGroup>
+</Project>

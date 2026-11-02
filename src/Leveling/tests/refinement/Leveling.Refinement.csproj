@@ -1,0 +1,7 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup><OutputType>Exe</OutputType><TargetFramework>net8.0</TargetFramework><Nullable>enable</Nullable><ImplicitUsings>enable</ImplicitUsings><TreatWarningsAsErrors>true</TreatWarningsAsErrors></PropertyGroup>
+  <ItemGroup>
+    <Compile Include="../../Services/TailscalePeerDiscoveryService.cs" Link="TailscalePeerDiscoveryService.cs" />
+    <Compile Include="../../Models/TailscalePeerInfo.cs" Link="TailscalePeerInfo.cs" />
+  </ItemGroup>
+</Project>

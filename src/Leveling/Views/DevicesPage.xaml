@@ -1,0 +1,716 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<Page xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:tips="using:Multiverse.Services" x:Class="Multiverse.Views.DevicesPage" Background="{StaticResource DesignBackground}" UseLayoutRounding="True">
+    <Grid>
+        <VisualStateManager.VisualStateGroups>
+            <VisualStateGroup x:Name="DeviceLayoutStates">
+                <!-- Desktop / large window -->
+                <VisualState x:Name="Wide">
+                    <VisualState.StateTriggers>
+                        <AdaptiveTrigger MinWindowWidth="1280"/>
+                    </VisualState.StateTriggers>
+                    <VisualState.Setters>
+                        <Setter Target="PagePadding.Padding" Value="28"/>
+                        <Setter Target="RefreshButton.(Grid.Row)" Value="0"/>
+                        <Setter Target="RefreshButton.(Grid.Column)" Value="1"/>
+                        <Setter Target="RefreshButton.HorizontalAlignment" Value="Right"/>
+                        <Setter Target="RefreshButton.Margin" Value="18,0,0,0"/>
+                        <Setter Target="CoreStatusPanel.(Grid.Row)" Value="0"/>
+                        <Setter Target="CoreStatusPanel.(Grid.Column)" Value="1"/>
+                        <Setter Target="CoreStatusPanel.HorizontalAlignment" Value="Right"/>
+                        <Setter Target="CoreStatusPanel.Margin" Value="18,0,0,0"/>
+                        <Setter Target="CaptureHeaderButtons.(Grid.Row)" Value="0"/>
+                        <Setter Target="CaptureHeaderButtons.(Grid.Column)" Value="1"/>
+                        <Setter Target="CaptureHeaderButtons.HorizontalAlignment" Value="Right"/>
+                        <Setter Target="CaptureHeaderButtons.Margin" Value="18,0,0,0"/>
+                        <Setter Target="CaptureStatsCol0.Width" Value="*"/>
+                        <Setter Target="CaptureStatsCol1.Width" Value="*"/>
+                        <Setter Target="CaptureStatsCol2.Width" Value="*"/>
+                        <Setter Target="CaptureStatsCol3.Width" Value="*"/>
+                        <Setter Target="CaptureStatsRow1.Height" Value="0"/>
+                        <Setter Target="CaptureStatSource.(Grid.Row)" Value="0"/>
+                        <Setter Target="CaptureStatSource.(Grid.Column)" Value="0"/>
+                        <Setter Target="CaptureStatGpu.(Grid.Row)" Value="0"/>
+                        <Setter Target="CaptureStatGpu.(Grid.Column)" Value="1"/>
+                        <Setter Target="CaptureStatPreview.(Grid.Row)" Value="0"/>
+                        <Setter Target="CaptureStatPreview.(Grid.Column)" Value="2"/>
+                        <Setter Target="CaptureStatFrame.(Grid.Row)" Value="0"/>
+                        <Setter Target="CaptureStatFrame.(Grid.Column)" Value="3"/>
+                        <Setter Target="PreviewBorder.MinHeight" Value="300"/>
+                        <Setter Target="EncoderHeaderButtons.(Grid.Row)" Value="0"/>
+                        <Setter Target="EncoderHeaderButtons.(Grid.Column)" Value="1"/>
+                        <Setter Target="EncoderHeaderButtons.HorizontalAlignment" Value="Right"/>
+                        <Setter Target="EncoderHeaderButtons.Margin" Value="18,0,0,0"/>
+                        <Setter Target="EncoderOptionCol0.Width" Value="*"/>
+                        <Setter Target="EncoderOptionCol1.Width" Value="*"/>
+                        <Setter Target="EncoderOptionCol2.Width" Value="*"/>
+                        <Setter Target="EncoderOptionCol3.Width" Value="*"/>
+                        <Setter Target="EncoderOptionRow1.Height" Value="0"/>
+                        <Setter Target="EncoderOptionFps.(Grid.Row)" Value="0"/>
+                        <Setter Target="EncoderOptionFps.(Grid.Column)" Value="0"/>
+                        <Setter Target="EncoderOptionBitrate.(Grid.Row)" Value="0"/>
+                        <Setter Target="EncoderOptionBitrate.(Grid.Column)" Value="1"/>
+                        <Setter Target="EncoderOptionPreset.(Grid.Row)" Value="0"/>
+                        <Setter Target="EncoderOptionPreset.(Grid.Column)" Value="2"/>
+                        <Setter Target="EncoderOptionTuning.(Grid.Row)" Value="0"/>
+                        <Setter Target="EncoderOptionTuning.(Grid.Column)" Value="3"/>
+                        <Setter Target="EncoderMetricCol0.Width" Value="*"/>
+                        <Setter Target="EncoderMetricCol1.Width" Value="*"/>
+                        <Setter Target="EncoderMetricCol2.Width" Value="*"/>
+                        <Setter Target="EncoderMetricCol3.Width" Value="*"/>
+                        <Setter Target="EncoderMetricCol4.Width" Value="*"/>
+                        <Setter Target="EncoderMetricRow1.Height" Value="0"/>
+                        <Setter Target="EncoderMetricRow2.Height" Value="0"/>
+                        <Setter Target="EncoderMetricRow3.Height" Value="0"/>
+                        <Setter Target="EncoderMetricRow4.Height" Value="0"/>
+                        <Setter Target="MetricFps.(Grid.Row)" Value="0"/>
+                        <Setter Target="MetricFps.(Grid.Column)" Value="0"/>
+                        <Setter Target="MetricBitrate.(Grid.Row)" Value="0"/>
+                        <Setter Target="MetricBitrate.(Grid.Column)" Value="1"/>
+                        <Setter Target="MetricLatency.(Grid.Row)" Value="0"/>
+                        <Setter Target="MetricLatency.(Grid.Column)" Value="2"/>
+                        <Setter Target="MetricSubmit.(Grid.Row)" Value="0"/>
+                        <Setter Target="MetricSubmit.(Grid.Column)" Value="3"/>
+                        <Setter Target="MetricQueue.(Grid.Row)" Value="0"/>
+                        <Setter Target="MetricQueue.(Grid.Column)" Value="4"/>
+                    </VisualState.Setters>
+                </VisualState>
+                <!-- Medium window: 2-column cards/options -->
+                <VisualState x:Name="Medium">
+                    <VisualState.StateTriggers>
+                        <AdaptiveTrigger MinWindowWidth="900"/>
+                    </VisualState.StateTriggers>
+                    <VisualState.Setters>
+                        <Setter Target="PagePadding.Padding" Value="20"/>
+                        <Setter Target="RefreshButton.(Grid.Row)" Value="0"/>
+                        <Setter Target="RefreshButton.(Grid.Column)" Value="1"/>
+                        <Setter Target="RefreshButton.HorizontalAlignment" Value="Right"/>
+                        <Setter Target="RefreshButton.Margin" Value="14,0,0,0"/>
+                        <Setter Target="CoreStatusPanel.(Grid.Row)" Value="0"/>
+                        <Setter Target="CoreStatusPanel.(Grid.Column)" Value="1"/>
+                        <Setter Target="CoreStatusPanel.HorizontalAlignment" Value="Right"/>
+                        <Setter Target="CoreStatusPanel.Margin" Value="12,0,0,0"/>
+                        <Setter Target="CaptureHeaderButtons.(Grid.Row)" Value="1"/>
+                        <Setter Target="CaptureHeaderButtons.(Grid.Column)" Value="0"/>
+                        <Setter Target="CaptureHeaderButtons.HorizontalAlignment" Value="Left"/>
+                        <Setter Target="CaptureHeaderButtons.Margin" Value="0,12,0,0"/>
+                        <Setter Target="CaptureStatsCol0.Width" Value="*"/>
+                        <Setter Target="CaptureStatsCol1.Width" Value="*"/>
+                        <Setter Target="CaptureStatsCol2.Width" Value="0"/>
+                        <Setter Target="CaptureStatsCol3.Width" Value="0"/>
+                        <Setter Target="CaptureStatsRow1.Height" Value="Auto"/>
+                        <Setter Target="CaptureStatSource.(Grid.Row)" Value="0"/>
+                        <Setter Target="CaptureStatSource.(Grid.Column)" Value="0"/>
+                        <Setter Target="CaptureStatGpu.(Grid.Row)" Value="0"/>
+                        <Setter Target="CaptureStatGpu.(Grid.Column)" Value="1"/>
+                        <Setter Target="CaptureStatPreview.(Grid.Row)" Value="1"/>
+                        <Setter Target="CaptureStatPreview.(Grid.Column)" Value="0"/>
+                        <Setter Target="CaptureStatFrame.(Grid.Row)" Value="1"/>
+                        <Setter Target="CaptureStatFrame.(Grid.Column)" Value="1"/>
+                        <Setter Target="PreviewBorder.MinHeight" Value="230"/>
+                        <Setter Target="EncoderHeaderButtons.(Grid.Row)" Value="1"/>
+                        <Setter Target="EncoderHeaderButtons.(Grid.Column)" Value="0"/>
+                        <Setter Target="EncoderHeaderButtons.HorizontalAlignment" Value="Left"/>
+                        <Setter Target="EncoderHeaderButtons.Margin" Value="0,12,0,0"/>
+                        <Setter Target="EncoderOptionCol0.Width" Value="*"/>
+                        <Setter Target="EncoderOptionCol1.Width" Value="*"/>
+                        <Setter Target="EncoderOptionCol2.Width" Value="0"/>
+                        <Setter Target="EncoderOptionCol3.Width" Value="0"/>
+                        <Setter Target="EncoderOptionRow1.Height" Value="Auto"/>
+                        <Setter Target="EncoderOptionFps.(Grid.Row)" Value="0"/>
+                        <Setter Target="EncoderOptionFps.(Grid.Column)" Value="0"/>
+                        <Setter Target="EncoderOptionBitrate.(Grid.Row)" Value="0"/>
+                        <Setter Target="EncoderOptionBitrate.(Grid.Column)" Value="1"/>
+                        <Setter Target="EncoderOptionPreset.(Grid.Row)" Value="1"/>
+                        <Setter Target="EncoderOptionPreset.(Grid.Column)" Value="0"/>
+                        <Setter Target="EncoderOptionTuning.(Grid.Row)" Value="1"/>
+                        <Setter Target="EncoderOptionTuning.(Grid.Column)" Value="1"/>
+                        <Setter Target="EncoderMetricCol0.Width" Value="*"/>
+                        <Setter Target="EncoderMetricCol1.Width" Value="*"/>
+                        <Setter Target="EncoderMetricCol2.Width" Value="0"/>
+                        <Setter Target="EncoderMetricCol3.Width" Value="0"/>
+                        <Setter Target="EncoderMetricCol4.Width" Value="0"/>
+                        <Setter Target="EncoderMetricRow1.Height" Value="Auto"/>
+                        <Setter Target="EncoderMetricRow2.Height" Value="Auto"/>
+                        <Setter Target="EncoderMetricRow3.Height" Value="0"/>
+                        <Setter Target="EncoderMetricRow4.Height" Value="0"/>
+                        <Setter Target="MetricFps.(Grid.Row)" Value="0"/>
+                        <Setter Target="MetricFps.(Grid.Column)" Value="0"/>
+                        <Setter Target="MetricBitrate.(Grid.Row)" Value="0"/>
+                        <Setter Target="MetricBitrate.(Grid.Column)" Value="1"/>
+                        <Setter Target="MetricLatency.(Grid.Row)" Value="1"/>
+                        <Setter Target="MetricLatency.(Grid.Column)" Value="0"/>
+                        <Setter Target="MetricSubmit.(Grid.Row)" Value="1"/>
+                        <Setter Target="MetricSubmit.(Grid.Column)" Value="1"/>
+                        <Setter Target="MetricQueue.(Grid.Row)" Value="2"/>
+                        <Setter Target="MetricQueue.(Grid.Column)" Value="0"/>
+                    </VisualState.Setters>
+                </VisualState>
+                <!-- Small window: everything stacks vertically -->
+                <VisualState x:Name="Narrow">
+                    <VisualState.StateTriggers>
+                        <AdaptiveTrigger MinWindowWidth="0"/>
+                    </VisualState.StateTriggers>
+                    <VisualState.Setters>
+                        <Setter Target="PagePadding.Padding" Value="12"/>
+                        <Setter Target="RefreshButton.(Grid.Row)" Value="1"/>
+                        <Setter Target="RefreshButton.(Grid.Column)" Value="0"/>
+                        <Setter Target="RefreshButton.HorizontalAlignment" Value="Stretch"/>
+                        <Setter Target="RefreshButton.Margin" Value="0,12,0,0"/>
+                        <Setter Target="CoreStatusPanel.(Grid.Row)" Value="1"/>
+                        <Setter Target="CoreStatusPanel.(Grid.Column)" Value="0"/>
+                        <Setter Target="CoreStatusPanel.HorizontalAlignment" Value="Left"/>
+                        <Setter Target="CoreStatusPanel.Margin" Value="0,12,0,0"/>
+                        <Setter Target="CaptureHeaderButtons.(Grid.Row)" Value="1"/>
+                        <Setter Target="CaptureHeaderButtons.(Grid.Column)" Value="0"/>
+                        <Setter Target="CaptureHeaderButtons.HorizontalAlignment" Value="Stretch"/>
+                        <Setter Target="CaptureHeaderButtons.Margin" Value="0,12,0,0"/>
+                        <Setter Target="MonitorComboBox.HorizontalAlignment" Value="Stretch"/>
+                        <Setter Target="CaptureStatsCol0.Width" Value="*"/>
+                        <Setter Target="CaptureStatsCol1.Width" Value="0"/>
+                        <Setter Target="CaptureStatsCol2.Width" Value="0"/>
+                        <Setter Target="CaptureStatsCol3.Width" Value="0"/>
+                        <Setter Target="CaptureStatsRow1.Height" Value="Auto"/>
+                        <Setter Target="CaptureStatsRow2.Height" Value="Auto"/>
+                        <Setter Target="CaptureStatsRow3.Height" Value="Auto"/>
+                        <Setter Target="CaptureStatSource.(Grid.Row)" Value="0"/>
+                        <Setter Target="CaptureStatSource.(Grid.Column)" Value="0"/>
+                        <Setter Target="CaptureStatGpu.(Grid.Row)" Value="1"/>
+                        <Setter Target="CaptureStatGpu.(Grid.Column)" Value="0"/>
+                        <Setter Target="CaptureStatPreview.(Grid.Row)" Value="2"/>
+                        <Setter Target="CaptureStatPreview.(Grid.Column)" Value="0"/>
+                        <Setter Target="CaptureStatFrame.(Grid.Row)" Value="3"/>
+                        <Setter Target="CaptureStatFrame.(Grid.Column)" Value="0"/>
+                        <Setter Target="PreviewBorder.MinHeight" Value="170"/>
+                        <Setter Target="EncoderHeaderButtons.(Grid.Row)" Value="1"/>
+                        <Setter Target="EncoderHeaderButtons.(Grid.Column)" Value="0"/>
+                        <Setter Target="EncoderHeaderButtons.HorizontalAlignment" Value="Stretch"/>
+                        <Setter Target="EncoderHeaderButtons.Margin" Value="0,12,0,0"/>
+                        <Setter Target="EncoderOptionCol0.Width" Value="*"/>
+                        <Setter Target="EncoderOptionCol1.Width" Value="0"/>
+                        <Setter Target="EncoderOptionCol2.Width" Value="0"/>
+                        <Setter Target="EncoderOptionCol3.Width" Value="0"/>
+                        <Setter Target="EncoderOptionRow1.Height" Value="Auto"/>
+                        <Setter Target="EncoderOptionRow2.Height" Value="Auto"/>
+                        <Setter Target="EncoderOptionRow3.Height" Value="Auto"/>
+                        <Setter Target="EncoderOptionFps.(Grid.Row)" Value="0"/>
+                        <Setter Target="EncoderOptionFps.(Grid.Column)" Value="0"/>
+                        <Setter Target="EncoderOptionBitrate.(Grid.Row)" Value="1"/>
+                        <Setter Target="EncoderOptionBitrate.(Grid.Column)" Value="0"/>
+                        <Setter Target="EncoderOptionPreset.(Grid.Row)" Value="2"/>
+                        <Setter Target="EncoderOptionPreset.(Grid.Column)" Value="0"/>
+                        <Setter Target="EncoderOptionTuning.(Grid.Row)" Value="3"/>
+                        <Setter Target="EncoderOptionTuning.(Grid.Column)" Value="0"/>
+                        <Setter Target="EncoderMetricCol0.Width" Value="*"/>
+                        <Setter Target="EncoderMetricCol1.Width" Value="0"/>
+                        <Setter Target="EncoderMetricCol2.Width" Value="0"/>
+                        <Setter Target="EncoderMetricCol3.Width" Value="0"/>
+                        <Setter Target="EncoderMetricCol4.Width" Value="0"/>
+                        <Setter Target="EncoderMetricRow1.Height" Value="Auto"/>
+                        <Setter Target="EncoderMetricRow2.Height" Value="Auto"/>
+                        <Setter Target="EncoderMetricRow3.Height" Value="Auto"/>
+                        <Setter Target="EncoderMetricRow4.Height" Value="Auto"/>
+                        <Setter Target="MetricFps.(Grid.Row)" Value="0"/>
+                        <Setter Target="MetricFps.(Grid.Column)" Value="0"/>
+                        <Setter Target="MetricBitrate.(Grid.Row)" Value="1"/>
+                        <Setter Target="MetricBitrate.(Grid.Column)" Value="0"/>
+                        <Setter Target="MetricLatency.(Grid.Row)" Value="2"/>
+                        <Setter Target="MetricLatency.(Grid.Column)" Value="0"/>
+                        <Setter Target="MetricSubmit.(Grid.Row)" Value="3"/>
+                        <Setter Target="MetricSubmit.(Grid.Column)" Value="0"/>
+                        <Setter Target="MetricQueue.(Grid.Row)" Value="4"/>
+                        <Setter Target="MetricQueue.(Grid.Column)" Value="0"/>
+                    </VisualState.Setters>
+                </VisualState>
+            </VisualStateGroup>
+        </VisualStateManager.VisualStateGroups>
+        <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+            <Border x:Name="PagePadding" Padding="28">
+                <Grid HorizontalAlignment="Stretch">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <!-- HEADER -->
+                    <Grid Margin="0,0,0,22">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <StackPanel>
+                            <TextBlock Text="TRANSMISSÃO" Foreground="#FFF4EF" FontSize="18" FontWeight="SemiBold"/>
+                            <TextBlock Text="Vídeo remoto • 30–120 FPS • o núcleo de streaming permanece protegido. Áudio e controle agora têm páginas próprias." Foreground="#8F9CA8" FontSize="12" TextWrapping="Wrap" Margin="0,5,0,0"/>
+                        </StackPanel>
+                        <Button x:Name="RefreshButton" Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Center" Content="Atualizar" Padding="18,8" Background="#1C252D" Foreground="#B9C2C9" BorderBrush="#303B45" BorderThickness="1" CornerRadius="8" Click="RefreshButton_Click"/>
+                    </Grid>
+                    <!-- CORE -->
+                    <Border Grid.Row="1" Background="#1C252D" BorderBrush="#303B45" BorderThickness="1" CornerRadius="13" Padding="18" Margin="0,0,0,14">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <StackPanel>
+                                <TextBlock Text="NÚCLEO NATIVO" Foreground="#8F9CA8" FontSize="9"/>
+                                <TextBlock x:Name="CoreStatusTitle" Text="Verificando..." Foreground="#FFF4EF" FontSize="15" FontWeight="SemiBold" TextWrapping="Wrap" Margin="0,6,0,0"/>
+                                <TextBlock x:Name="CoreStatusDescription" Text="Aguardando Leveling Core." Foreground="#8F9CA8" FontSize="11" TextWrapping="Wrap" Margin="0,5,0,0"/>
+                            </StackPanel>
+                            <StackPanel x:Name="CoreStatusPanel" Grid.Column="1" Orientation="Horizontal" Spacing="7" VerticalAlignment="Center">
+                                <Ellipse x:Name="CoreStatusDot" Width="7" Height="7" Fill="#8F9CA8" VerticalAlignment="Center"/>
+                                <TextBlock x:Name="CoreStatusBadge" Text="Verificando" Foreground="#AAAAAA" TextWrapping="Wrap"/>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+                    <!-- GPU -->
+                    <StackPanel Grid.Row="2" Margin="0,0,0,18">
+                        <TextBlock Text="GPU" Foreground="#FFF4EF" FontSize="13" FontWeight="SemiBold" Margin="2,0,0,10"/>
+                        <StackPanel x:Name="GpuListPanel" Spacing="9"/>
+                    </StackPanel>
+                    <!-- MONITORS -->
+                    <StackPanel Grid.Row="3" Margin="0,0,0,18">
+                        <TextBlock Text="MONITORES" Foreground="#FFF4EF" FontSize="13" FontWeight="SemiBold" Margin="2,0,0,10"/>
+                        <StackPanel x:Name="MonitorListPanel" Spacing="9"/>
+                    </StackPanel>
+                    <!-- CAPTURE -->
+                    <Border Grid.Row="4" Background="#1C252D" BorderBrush="#303B45" BorderThickness="1" CornerRadius="10" Padding="16" Margin="0,0,0,14">
+                        <StackPanel Spacing="14">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <StackPanel>
+                                    <TextBlock Text="CAPTURA / PREVIEW" Foreground="#8F9CA8" FontSize="10" FontWeight="SemiBold"/>
+                                    <TextBlock Text="Desktop Duplication" Foreground="#FFF4EF" FontSize="17" FontWeight="SemiBold" TextWrapping="Wrap" Margin="0,6,0,0"/>
+                                    <TextBlock Text="Durante o encode, o preview diagnóstico cai para ~5 FPS para não competir com a transmissão." Foreground="#8F9CA8" FontSize="10" TextWrapping="Wrap" Margin="0,5,0,0"/>
+                                </StackPanel>
+                                <StackPanel x:Name="CaptureHeaderButtons" Grid.Column="1" HorizontalAlignment="Right" Orientation="Horizontal" Spacing="9">
+                                    <Button x:Name="StartPreviewButton" Content="Iniciar preview" Padding="17,8" Background="#E62D4F" Foreground="#1C252D" BorderThickness="0" CornerRadius="8" Click="StartPreviewButton_Click"/>
+                                    <Button x:Name="StopPreviewButton" Content="Parar" Padding="17,8" Background="#1C252D" Foreground="#BEBEBE" BorderBrush="#303B45" BorderThickness="1" CornerRadius="8" IsEnabled="False" Click="StopPreviewButton_Click"/>
+                                </StackPanel>
+                            </Grid>
+                            <ComboBox x:Name="MonitorComboBox" tips:LevelingInfoToolTip.Text="Escolhe qual monitor do host será usado como fonte de captura para preview e transmissão." HorizontalAlignment="Stretch" MaxWidth="520" Background="#1C252D"/>
+                            <Grid ColumnSpacing="9" RowSpacing="9">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition x:Name="CaptureStatsRow1" Height="0"/>
+                                    <RowDefinition x:Name="CaptureStatsRow2" Height="0"/>
+                                    <RowDefinition x:Name="CaptureStatsRow3" Height="0"/>
+                                </Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition x:Name="CaptureStatsCol0" Width="*"/>
+                                    <ColumnDefinition x:Name="CaptureStatsCol1" Width="*"/>
+                                    <ColumnDefinition x:Name="CaptureStatsCol2" Width="*"/>
+                                    <ColumnDefinition x:Name="CaptureStatsCol3" Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Border x:Name="CaptureStatSource" Grid.Column="0" Background="#1C252D" BorderBrush="#303B45" BorderThickness="1" CornerRadius="9" Padding="12">
+                                    <StackPanel>
+                                        <TextBlock Text="FONTE" Foreground="#8F9CA8" FontSize="8"/>
+                                        <TextBlock x:Name="SourceResolutionTextBlock" Text="-- × --" Foreground="#FFF4EF" FontWeight="SemiBold" Margin="0,5,0,0"/>
+                                    </StackPanel>
+                                </Border>
+                                <Border x:Name="CaptureStatGpu" Grid.Column="1" Background="#1C252D" BorderBrush="#303B45" BorderThickness="1" CornerRadius="9" Padding="12">
+                                    <StackPanel>
+                                        <TextBlock Text="DESKTOP UPDATE" Foreground="#8F9CA8" FontSize="8" ToolTipService.ToolTip="Frames em que a imagem do desktop realmente mudou. Atualizações exclusivas do cursor são enviadas separadamente. Esta taxa mede atividade do desktop, não o FPS alvo do stream."/>
+                                        <TextBlock x:Name="CaptureFpsTextBlock" Text="-- FPS" Foreground="#E62D4F" FontWeight="SemiBold" Margin="0,5,0,0"/>
+                                    </StackPanel>
+                                </Border>
+                                <Border x:Name="CaptureStatPreview" Grid.Column="2" Background="#1C252D" BorderBrush="#303B45" BorderThickness="1" CornerRadius="9" Padding="12">
+                                    <StackPanel>
+                                        <TextBlock Text="PREVIEW UI" Foreground="#8F9CA8" FontSize="8"/>
+                                        <TextBlock x:Name="PreviewFpsTextBlock" Text="-- FPS" Foreground="#FFF4EF" FontWeight="SemiBold" Margin="0,5,0,0"/>
+                                    </StackPanel>
+                                </Border>
+                                <Border x:Name="CaptureStatFrame" Grid.Column="3" Background="#1C252D" BorderBrush="#303B45" BorderThickness="1" CornerRadius="9" Padding="12">
+                                    <StackPanel>
+                                        <TextBlock Text="FRAME" Foreground="#8F9CA8" FontSize="8"/>
+                                        <TextBlock x:Name="FrameIdTextBlock" Text="#0" Foreground="#FFF4EF" FontWeight="SemiBold" Margin="0,5,0,0"/>
+                                    </StackPanel>
+                                </Border>
+                            </Grid>
+                            <TextBlock x:Name="CapturePipelineTelemetryTextBlock" Text="CAPTURE PIPELINE  •  aguardando dados" Foreground="#8F9CA8" FontSize="9" TextWrapping="Wrap"/>
+                            <TextBlock x:Name="CapturePipelineDetailTextBlock" Text="CAPTURE DETAIL  •  aguardando dados" Foreground="#626262" FontSize="9" TextWrapping="Wrap"/>
+                            <Border x:Name="PreviewBorder" Background="{StaticResource DesignField}" BorderBrush="#303B45" BorderThickness="1" CornerRadius="11" MinHeight="300" MaxHeight="540">
+                                <Grid>
+                                    <Image x:Name="PreviewImage" Stretch="Uniform"/>
+                                    <StackPanel x:Name="PreviewPlaceholderPanel" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="16">
+                                        <TextBlock Text="Inicie o preview para testar a captura." Foreground="#696969" TextWrapping="Wrap" TextAlignment="Center"/>
+                                    </StackPanel>
+                                </Grid>
+                            </Border>
+                        </StackPanel>
+                    </Border>
+                    <!-- ENCODER -->
+                    <Border Grid.Row="5" Background="#1C252D" BorderBrush="#303B45" BorderThickness="1" CornerRadius="10" Padding="16">
+                        <StackPanel Spacing="15">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <StackPanel>
+                                    <TextBlock Text="ENCODER H.264" Foreground="#8F9CA8" FontSize="10" FontWeight="SemiBold"/>
+                                    <TextBlock Text="NVIDIA NVENC • pipeline assíncrono" Foreground="#FFF4EF" FontSize="17" FontWeight="SemiBold" TextWrapping="Wrap" Margin="0,6,0,0"/>
+                                    <TextBlock x:Name="NvencSupportTextBlock" Text="Verificando suporte..." Foreground="#8F9CA8" FontSize="10" TextWrapping="Wrap" Margin="0,5,0,0"/>
+                                </StackPanel>
+                                <StackPanel x:Name="EncoderHeaderButtons" Grid.Column="1" HorizontalAlignment="Right" Orientation="Horizontal" Spacing="8">
+                                    <Button x:Name="StartEncoderButton" Content="Iniciar encoder" IsEnabled="False" Padding="17,8" Background="#E62D4F" Foreground="#1C252D" BorderThickness="0" CornerRadius="8" Click="StartEncoderButton_Click"/>
+                                    <Button x:Name="ForceIdrButton" Content="Forçar IDR" IsEnabled="False" Padding="14,8" Background="#1C252D" BorderBrush="#303B45" BorderThickness="1" CornerRadius="8" Click="ForceIdrButton_Click"/>
+                                    <Button x:Name="StopEncoderButton" Content="Parar" IsEnabled="False" Padding="14,8" Background="#1C252D" BorderBrush="#303B45" BorderThickness="1" CornerRadius="8" Click="StopEncoderButton_Click"/>
+                                </StackPanel>
+                            </Grid>
+                            <Grid ColumnSpacing="10" RowSpacing="10">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition x:Name="EncoderOptionRow1" Height="0"/>
+                                    <RowDefinition x:Name="EncoderOptionRow2" Height="0"/>
+                                    <RowDefinition x:Name="EncoderOptionRow3" Height="0"/>
+                                </Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition x:Name="EncoderOptionCol0" Width="*"/>
+                                    <ColumnDefinition x:Name="EncoderOptionCol1" Width="*"/>
+                                    <ColumnDefinition x:Name="EncoderOptionCol2" Width="*"/>
+                                    <ColumnDefinition x:Name="EncoderOptionCol3" Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <StackPanel x:Name="EncoderOptionFps" Grid.Column="0">
+                                    <TextBlock Text="FPS da transmissão" Foreground="#8F9CA8" FontSize="9"/>
+                                    <ComboBox x:Name="EncoderFpsComboBox" tips:LevelingInfoToolTip.Text="Define o FPS alvo usado neste teste/configuração do encoder. 60 FPS é recomendado para jogos quando a captura e a rede conseguem acompanhar." SelectedIndex="1" HorizontalAlignment="Stretch" Margin="0,6,0,0">
+                                        <ComboBoxItem Content="30"/>
+                                        <ComboBoxItem Content="60"/>
+<ComboBoxItem Content="80"/>
+<ComboBoxItem Content="90"/>
+<ComboBoxItem Content="120"/>
+                                    </ComboBox>
+                                </StackPanel>
+                                <StackPanel x:Name="EncoderOptionBitrate" Grid.Column="1">
+                                    <TextBlock Text="Bitrate de vídeo" Foreground="#8F9CA8" FontSize="9"/>
+                                    <ComboBox x:Name="EncoderBitrateComboBox" tips:LevelingInfoToolTip.Text="Define o bitrate de vídeo do encoder. Mais bitrate melhora detalhes e reduz artefatos, mas aumenta o tráfego e a chance de congestionamento." SelectedIndex="5" HorizontalAlignment="Stretch" Margin="0,6,0,0">
+                                        <ComboBoxItem Content="5 Mbps" Tag="5000"/>
+                                        <ComboBoxItem Content="8 Mbps" Tag="8000"/>
+                                        <ComboBoxItem Content="10 Mbps" Tag="10000"/>
+                                        <ComboBoxItem Content="12 Mbps" Tag="12000"/>
+                                        <ComboBoxItem Content="15 Mbps" Tag="15000"/>
+                                        <ComboBoxItem Content="20 Mbps" Tag="20000"/>
+                                        <ComboBoxItem Content="25 Mbps" Tag="25000"/>
+                                        <ComboBoxItem Content="30 Mbps" Tag="30000"/>
+                                        <ComboBoxItem Content="35 Mbps" Tag="35000"/>
+                                        <ComboBoxItem Content="40 Mbps" Tag="40000"/>
+                                        <ComboBoxItem Content="45 Mbps" Tag="45000"/>
+                                        <ComboBoxItem Content="50 Mbps" Tag="50000"/>
+                                        <ComboBoxItem Content="60 Mbps" Tag="60000"/>
+                                        <ComboBoxItem Content="65 Mbps" Tag="65000"/>
+                                        <ComboBoxItem Content="75 Mbps" Tag="75000"/>
+                                        <ComboBoxItem Content="80 Mbps" Tag="80000"/>
+                                        <ComboBoxItem Content="100 Mbps" Tag="100000"/>
+                                        <ComboBoxItem Content="120 Mbps" Tag="120000"/>
+                                        <ComboBoxItem Content="150 Mbps" Tag="150000"/>
+                                    </ComboBox>
+                                </StackPanel>
+                                <StackPanel x:Name="EncoderOptionPreset" Grid.Column="2">
+                                    <TextBlock Text="Preset" Foreground="#8F9CA8" FontSize="9"/>
+                                    <ComboBox x:Name="EncoderPresetComboBox" tips:LevelingInfoToolTip.Text="Seleciona o preset NVENC. P1 prioriza desempenho; P2 é o equilíbrio recomendado; P3/P4 usam mais trabalho da GPU em troca de qualidade." SelectedIndex="0" HorizontalAlignment="Stretch" Margin="0,6,0,0">
+                                        <ComboBoxItem Content="Auto • P2 equilibrado" Tag="0"/>
+                                        <ComboBoxItem Content="P1 • máximo desempenho" Tag="1"/>
+                                        <ComboBoxItem Content="P2 • equilíbrio" Tag="2"/>
+                                        <ComboBoxItem Content="P3 • mais qualidade" Tag="3"/>
+                                        <ComboBoxItem Content="P4 • qualidade" Tag="4"/>
+                                    </ComboBox>
+                                </StackPanel>
+                                <StackPanel x:Name="EncoderOptionTuning" Grid.Column="3">
+                                    <TextBlock Text="Tuning" Foreground="#8F9CA8" FontSize="9"/>
+                                    <ComboBox x:Name="EncoderTuningComboBox" tips:LevelingInfoToolTip.Text="Escolhe o tuning de latência do NVENC. Ultra Low Latency é indicado para jogar remotamente; Low Latency permite um pouco mais de folga ao encoder." SelectedIndex="0" HorizontalAlignment="Stretch" Margin="0,6,0,0">
+                                        <ComboBoxItem Content="Ultra Low Latency" Tag="1"/>
+                                        <ComboBoxItem Content="Low Latency" Tag="0"/>
+                                    </ComboBox>
+                                </StackPanel>
+                            </Grid>
+                            <Button x:Name="AdvancedPipelineButton" Content="Mostrar pipeline avançado" HorizontalAlignment="Left" Padding="12,7" Background="#1C252D" BorderBrush="#303B45" BorderThickness="1" CornerRadius="8" Click="AdvancedPipelineButton_Click"/>
+                            <StackPanel x:Name="AdvancedPipelinePanel" Visibility="Collapsed" Spacing="6">
+                                <TextBlock Text="PIPELINE DO HOST • CORE 11.17g • FIXED 60 + WGC 14 ms + COPY GPU QUERY + FLUSH1(COPY)" Foreground="#8F9CA8" FontSize="9"/>
+                                <ComboBox x:Name="EncoderLabModeComboBox" tips:LevelingInfoToolTip.Text="Seleciona a implementação do pipeline de captura/encode. O modo CORE atual é o recomendado; os demais existem principalmente para fallback e diagnóstico." SelectedIndex="0" HorizontalAlignment="Stretch">
+                                    <ComboBoxItem Content="CORE 11.17g • WGC 14 ms → CopyResource + GPU EVENT → Flush1(COPY) → NVENC • PRESSURE OBSERVER" Tag="10"/>
+                                    <ComboBoxItem Content="CORE 11.15c FALLBACK • FAIR GPU • WGC → ring nativo → CopyResource nativo → NVENC" Tag="9"/>
+                                    <ComboBoxItem Content="CORE 11.14 FALLBACK • WGC → ring nativo → RGB scaler no EncodeDevice → NVENC" Tag="8"/>
+                                    <ComboBoxItem Content="CORE 11.13 FALLBACK • RGB ring escalado no CaptureDevice → NVENC direto" Tag="7"/>
+                                    <ComboBoxItem Content="CORE 11.12 FALLBACK • WGC → NV12 + VideoProcessor" Tag="6"/>
+                                    <ComboBoxItem Content="CORE 10.1 • WGC BGRA isolado (comparação)" Tag="5"/>
+                                    <ComboBoxItem Content="CORE 10.0 • DXGI BGRA isolado (fallback)" Tag="4"/>
+                                    <ComboBoxItem Content="Sintético • baseline NVENC" Tag="3"/>
+                                    <ComboBoxItem Content="Legado 09.3.6 • ARGB mesmo device" Tag="2"/>
+                                    <ComboBoxItem Content="Legado 09.3.6 • NV12/VideoProcessor" Tag="1"/>
+                                </ComboBox>
+                                <TextBlock Text="CORE 11.17g preserva o host estável da 11.17e e testa somente uma reserva pequena de captura: WGC 14 ms. PRESSURE/RECOVERING continuam apenas telemetria; ingress-cap, deadline-aware e target acompanham o FPS configurado." Foreground="#555555" FontSize="9" TextWrapping="Wrap"/>
+                            </StackPanel>
+                            <Grid ColumnSpacing="9" RowSpacing="9">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition x:Name="EncoderMetricRow1" Height="0"/>
+                                    <RowDefinition x:Name="EncoderMetricRow2" Height="0"/>
+                                    <RowDefinition x:Name="EncoderMetricRow3" Height="0"/>
+                                    <RowDefinition x:Name="EncoderMetricRow4" Height="0"/>
+                                </Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition x:Name="EncoderMetricCol0" Width="*"/>
+                                    <ColumnDefinition x:Name="EncoderMetricCol1" Width="*"/>
+                                    <ColumnDefinition x:Name="EncoderMetricCol2" Width="*"/>
+                                    <ColumnDefinition x:Name="EncoderMetricCol3" Width="*"/>
+                                    <ColumnDefinition x:Name="EncoderMetricCol4" Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Border x:Name="MetricFps" Grid.Column="0" Background="#1C252D" BorderBrush="#303B45" BorderThickness="1" CornerRadius="9" Padding="12">
+                                    <StackPanel>
+                                        <TextBlock Text="ENCODE FPS" Foreground="#8F9CA8" FontSize="8"/>
+                                        <TextBlock x:Name="EncoderFpsTextBlock" Text="-- FPS" Foreground="#E62D4F" FontWeight="SemiBold" Margin="0,5,0,0"/>
+                                    </StackPanel>
+                                </Border>
+                                <Border x:Name="MetricBitrate" Grid.Column="1" Background="#1C252D" BorderBrush="#303B45" BorderThickness="1" CornerRadius="9" Padding="12">
+                                    <StackPanel>
+                                        <TextBlock Text="BITRATE REAL" Foreground="#8F9CA8" FontSize="8"/>
+                                        <TextBlock x:Name="EncoderOutputBitrateTextBlock" Text="-- Mbps" Foreground="#FFF4EF" FontWeight="SemiBold" Margin="0,5,0,0"/>
+                                    </StackPanel>
+                                </Border>
+                                <Border x:Name="MetricLatency" Grid.Column="2" Background="#1C252D" BorderBrush="#303B45" BorderThickness="1" CornerRadius="9" Padding="12">
+                                    <StackPanel>
+                                        <TextBlock Text="LATÊNCIA NVENC" Foreground="#8F9CA8" FontSize="8"/>
+                                        <TextBlock x:Name="EncoderLatencyTextBlock" Text="-- ms" Foreground="#FFF4EF" FontWeight="SemiBold" Margin="0,5,0,0"/>
+                                    </StackPanel>
+                                </Border>
+                                <Border x:Name="MetricSubmit" Grid.Column="3" Background="#1C252D" BorderBrush="#303B45" BorderThickness="1" CornerRadius="9" Padding="12">
+                                    <StackPanel>
+                                        <TextBlock Text="SUBMIT CPU" Foreground="#8F9CA8" FontSize="8"/>
+                                        <TextBlock x:Name="EncoderSubmitTextBlock" Text="-- ms" Foreground="#FFF4EF" FontWeight="SemiBold" Margin="0,5,0,0"/>
+                                    </StackPanel>
+                                </Border>
+                                <Border x:Name="MetricQueue" Grid.Column="4" Background="#1C252D" BorderBrush="#303B45" BorderThickness="1" CornerRadius="9" Padding="12">
+                                    <StackPanel>
+                                        <TextBlock Text="IN-FLIGHT / DROP" Foreground="#8F9CA8" FontSize="8"/>
+                                        <TextBlock x:Name="EncoderQueueTextBlock" Text="0/4 • 0" Foreground="#FFF4EF" FontWeight="SemiBold" Margin="0,5,0,0"/>
+                                    </StackPanel>
+                                </Border>
+                            </Grid>
+                            <TextBlock x:Name="EncoderStatusTextBlock" Text="Encoder parado." Foreground="#8F9CA8" FontSize="10" TextWrapping="Wrap"/>
+                            <TextBlock x:Name="EncoderDiagnosticsTextBlock" Text="ENCODER DIAG  •  aguardando encoder" Foreground="#626262" FontSize="9" TextWrapping="Wrap"/>
+                            <TextBlock x:Name="EncoderStabilityProbeTextBlock" Text="CORE 11.13 STABILITY SNAPSHOT  •  aguardando encoder" Foreground="#E62D4F" FontSize="9" TextWrapping="Wrap"/>
+                            <TextBlock x:Name="EncoderRingFenceProbeTextBlock" Text="CORE 11.12 RING/FENCE ISOLATION PROBE  •  aguardando encoder" Foreground="#E62D4F" FontSize="9" TextWrapping="Wrap"/>
+                        </StackPanel>
+                    </Border>
+                    <!-- TRANSPORT -->
+                    <Border Grid.Row="6" Background="#1C252D" BorderBrush="#303B45" BorderThickness="1" CornerRadius="10" Padding="16" Margin="0,14,0,0">
+                        <StackPanel Spacing="14">
+                            <Border Background="#1C252D" BorderBrush="#303B45" BorderThickness="0" CornerRadius="12" Padding="14">
+                                <StackPanel Spacing="7">
+                                    <TextBlock Text="SESSÃO REAL • SOMENTE LEITURA" Foreground="#E62D4F" FontSize="11" FontWeight="SemiBold"/>
+                                    <TextBlock x:Name="RuntimeTelemetryTextBlock" Foreground="#B9C2C9" FontSize="10" FontFamily="Consolas" TextWrapping="Wrap"/>
+                                </StackPanel>
+                            </Border>
+                            <StackPanel>
+                                <TextBlock Text="TRANSPORTE • CORE 11.3" Foreground="#8F9CA8" FontSize="10" FontWeight="SemiBold"/>
+                                <TextBlock Text="UDP de baixa latência • sessão real" Foreground="#FFF4EF" FontSize="17" FontWeight="SemiBold" TextWrapping="Wrap" Margin="0,6,0,0"/>
+                                <TextBlock Text="CORE 11.3: o bitrate escolhido é o alvo de vídeo/NVENC. O transporte reserva automaticamente a margem de MVTP + FEC e só reduz a qualidade quando RTT, perda ou fila indicarem congestionamento real." Foreground="#8F9CA8" FontSize="10" TextWrapping="Wrap" Margin="0,5,0,0"/>
+                            </StackPanel>
+                            <Border Background="#1C252D" BorderBrush="#303B45" BorderThickness="1" CornerRadius="9" Padding="12">
+                                <TextBlock x:Name="RemoteSessionTextBlock" Text="Sem sessão remota • loopback disponível." Foreground="#B9C2C9" FontSize="10" TextWrapping="Wrap"/>
+                            </Border>
+                            <Border x:Name="LegacyGamepadCard" Visibility="Collapsed" Background="#1C252D" BorderBrush="#303B45" BorderThickness="1" CornerRadius="9" Padding="12">
+                                <StackPanel Spacing="4">
+                                    <TextBlock Text="CONTROLE REMOTO • CORE 11.24 INPUT" Foreground="#8F9CA8" FontSize="9" FontWeight="SemiBold"/>
+                                    <TextBlock x:Name="GamepadStatusTextBlock" Text="Aguardando sessão remota • XInput automático no cliente." Foreground="#8F9CA8" FontSize="10" FontWeight="SemiBold" TextWrapping="Wrap"/>
+                                    <TextBlock Text="XInput (cliente) → canal latest-wins → Xbox 360 virtual (host/ViGEm). Se o input parar por 250 ms, todos os botões/sticks são neutralizados automaticamente." Foreground="#7E8A9B" FontSize="9" TextWrapping="Wrap"/>
+                                </StackPanel>
+                            </Border>
+                            <Border x:Name="LegacyAudioCard" Visibility="Collapsed" Background="#1C252D" BorderBrush="#303B45" BorderThickness="1" CornerRadius="9" Padding="12">
+                                <StackPanel Spacing="8">
+                                    <StackPanel Spacing="3">
+                                        <TextBlock Text="ÁUDIO REMOTO • CORE 11.21" Foreground="#8F9CA8" FontSize="9" FontWeight="SemiBold"/>
+                                        <TextBlock Text="Áudio por aplicativo • seleção manual" Foreground="#B9C2C9" FontSize="10" FontWeight="SemiBold"/>
+                                        <TextBlock Text="Somente o aplicativo escolhido é enviado. Microfone, Discord e outros programas ficam fora da transmissão quando não forem selecionados." Foreground="#7E8A9B" FontSize="9" TextWrapping="Wrap"/>
+                                    </StackPanel>
+                                    <Grid ColumnSpacing="8">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <ComboBox x:Name="AudioProcessComboBox" tips:LevelingInfoToolTip.Text="Escolhe qual processo terá o áudio capturado no teste/controle de áudio desta página." Grid.Column="0" MinWidth="250" PlaceholderText="Selecione um aplicativo com áudio" SelectionChanged="AudioProcessComboBox_SelectionChanged"/>
+                                        <Button x:Name="RefreshAudioProcessesButton" Grid.Column="1" Content="Atualizar" Padding="12,6" Click="RefreshAudioProcessesButton_Click"/>
+                                    </Grid>
+                                    <StackPanel Orientation="Horizontal" Spacing="8">
+                                        <Button x:Name="ToggleRemoteAudioButton" Content="Transmitir áudio selecionado" Padding="14,7" Background="#E62D4F" Foreground="#1C252D" BorderThickness="0" CornerRadius="7" Click="ToggleRemoteAudioButton_Click"/>
+                                    </StackPanel>
+                                    <Border Height="1" Background="#26313A" Margin="0,3,0,1"/>
+                                    <StackPanel Spacing="3">
+                                        <TextBlock Text="REPRODUÇÃO NO CLIENTE" Foreground="#8F9CA8" FontSize="9" FontWeight="SemiBold"/>
+                                        <TextBlock Text="Escolha onde o áudio remoto será reproduzido e ajuste o volume somente neste PC cliente." Foreground="#7E8A9B" FontSize="9" TextWrapping="Wrap"/>
+                                    </StackPanel>
+                                    <Grid ColumnSpacing="8">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <ComboBox x:Name="AudioOutputDeviceComboBox" tips:LevelingInfoToolTip.Text="Escolhe o dispositivo em que o cliente reproduz o áudio remoto, sem reiniciar a sessão de vídeo." Grid.Column="0" MinWidth="250" PlaceholderText="Dispositivo de saída do cliente" SelectionChanged="AudioOutputDeviceComboBox_SelectionChanged"/>
+                                        <Button x:Name="RefreshAudioOutputDevicesButton" Grid.Column="1" Content="Atualizar" Padding="12,6" Click="RefreshAudioOutputDevicesButton_Click"/>
+                                    </Grid>
+                                    <Grid ColumnSpacing="10">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="52"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Grid.Column="0" Text="Volume" Foreground="#B9C2C9" FontSize="9" VerticalAlignment="Center"/>
+                                        <Slider x:Name="RemoteAudioVolumeSlider" tips:LevelingInfoToolTip.Text="Controla o volume do áudio remoto reproduzido no cliente. Não altera o áudio original do host." Grid.Column="1" Minimum="0" Maximum="200" StepFrequency="5" Value="100" ValueChanged="RemoteAudioVolumeSlider_ValueChanged"/>
+                                        <TextBlock x:Name="RemoteAudioVolumeValueTextBlock" Grid.Column="2" Text="100%" Foreground="#B9C2C9" FontSize="9" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                                    </Grid>
+                                    <TextBlock Text="100% = volume original • até 200% = boost digital com proteção contra estouro." Foreground="#555555" FontSize="8" TextWrapping="Wrap"/>
+                                    <TextBlock x:Name="RemoteAudioStatusTextBlock" Text="Áudio parado" Foreground="#8F9CA8" FontSize="9" TextWrapping="Wrap"/>
+                                </StackPanel>
+                            </Border>
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                <Button x:Name="StartTransportButton" Content="Testar transporte local" IsEnabled="False" Padding="17,8" Background="#E62D4F" Foreground="#1C252D" BorderThickness="0" CornerRadius="8" Click="StartTransportButton_Click"/>
+                                <Button x:Name="StopTransportButton" Content="Parar" IsEnabled="False" Padding="14,8" Background="#1C252D" BorderBrush="#303B45" BorderThickness="1" CornerRadius="8" Click="StopTransportButton_Click"/>
+                            </StackPanel>
+                            <StackPanel Spacing="4">
+                                <ToggleSwitch x:Name="LoopbackHeadlessToggleSwitch" tips:LevelingInfoToolTip.Text="Ativa o modo loopback/headless usado em testes específicos. Para uso normal remoto, deixe desativado a menos que saiba que precisa dele." Header="Isolamento do teste local" OffContent="VISUAL • NVDEC → D3D11/DWM" OnContent="HEADLESS • NVDEC sem D3D11/Present" IsOn="False" Foreground="#B9C2C9"/>
+                                <TextBlock Text="HEADLESS mede host + NVENC + UDP + NVDEC sem o presenter local competir com o jogo na mesma GPU. Não altera sessões remotas." Foreground="#8F9CA8" FontSize="9" TextWrapping="Wrap"/>
+                            </StackPanel>
+                            <!-- Tabela vertical: permanece legível até em janela estreita. -->
+                            <Grid ColumnSpacing="16" RowSpacing="8">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+                                <TextBlock Grid.Row="0" Text="TX UDP" Foreground="#8F9CA8"/>
+                                <TextBlock x:Name="TransportTxTextBlock" Grid.Row="0" Grid.Column="1" Text="-- Mbps" Foreground="#E62D4F" FontWeight="SemiBold"/>
+                                <TextBlock Grid.Row="1" Text="RX UDP" Foreground="#8F9CA8"/>
+                                <TextBlock x:Name="TransportRxTextBlock" Grid.Row="1" Grid.Column="1" Text="-- Mbps" Foreground="#FFF4EF" FontWeight="SemiBold"/>
+                                <TextBlock Grid.Row="2" Text="Frames remontados" Foreground="#8F9CA8"/>
+                                <TextBlock x:Name="TransportFrameRateTextBlock" Grid.Row="2" Grid.Column="1" Text="-- FPS" Foreground="#FFF4EF" FontWeight="SemiBold"/>
+                                <TextBlock Grid.Row="3" Text="Datagramas recebidos" Foreground="#8F9CA8"/>
+                                <TextBlock x:Name="TransportPacketRateTextBlock" Grid.Row="3" Grid.Column="1" Text="-- pkt/s" Foreground="#FFF4EF" FontWeight="SemiBold"/>
+                                <TextBlock Grid.Row="4" Text="RTT / latência de rede" Foreground="#8F9CA8" TextWrapping="Wrap"/>
+                                <TextBlock x:Name="TransportLatencyTextBlock" Grid.Row="4" Grid.Column="1" Text="-- ms" Foreground="#FFF4EF" FontWeight="SemiBold"/>
+                                <TextBlock Grid.Row="5" Text="Frames incompletos / saltos" Foreground="#8F9CA8" TextWrapping="Wrap"/>
+                                <TextBlock x:Name="TransportDropTextBlock" Grid.Row="5" Grid.Column="1" Text="0 / 0" Foreground="#FFF4EF" FontWeight="SemiBold"/>
+                                <TextBlock Grid.Row="6" Text="Frames pendentes" Foreground="#8F9CA8"/>
+                                <TextBlock x:Name="TransportPendingTextBlock" Grid.Row="6" Grid.Column="1" Text="0" Foreground="#FFF4EF" FontWeight="SemiBold"/>
+                            </Grid>
+                            <TextBlock x:Name="TransportStatusTextBlock" Text="Transporte parado." Foreground="#8F9CA8" FontSize="10" TextWrapping="Wrap"/>
+                            <TextBlock Text="MVTP v6 + FEC • controle v17 • UDP 47821 • datagramas de 1200 B • TCP 47820 para sessão/keepalive/IDR/gamepad/cursor • descoberta LAN UDP 47822." Foreground="#7E8A9B" FontSize="9" TextWrapping="Wrap"/>
+                        </StackPanel>
+                    </Border>
+                    <!-- LOCAL CLIENT DECODE -->
+                    <Border Grid.Row="7" Background="#1C252D" BorderBrush="#303B45" BorderThickness="1" CornerRadius="10" Padding="16" Margin="0,14,0,0">
+                        <StackPanel Spacing="14">
+                            <StackPanel>
+                                <TextBlock Text="CLIENTE • CORE 11.17f WAITABLE PRESENTER" Foreground="#8F9CA8" FontSize="10" FontWeight="SemiBold"/>
+                                <TextBlock Text="NVDEC → D3D11 • cliente remoto" Foreground="#FFF4EF" FontSize="17" FontWeight="SemiBold" TextWrapping="Wrap" Margin="0,6,0,0"/>
+                                <TextBlock Text="Cliente CORE 10: recebe H.264, remonta em ordem, decodifica no NVDEC e usa presenter D3D11 assíncrono latest-frame-wins com cursor separado." Foreground="#8F9CA8" FontSize="10" TextWrapping="Wrap" Margin="0,5,0,0"/>
+                                <TextBlock Text="CORE 11.17f CLIENTE • waitable gate 20 ms • Present flags 0 • latest-frame-wins" Foreground="#E62D4F" FontSize="10" FontWeight="SemiBold" TextWrapping="Wrap" Margin="0,5,0,0"/>
+                            </StackPanel>
+                            <Border x:Name="ClientDecodeFrame" Background="{StaticResource DesignField}" BorderBrush="#303B45" BorderThickness="1" CornerRadius="11" MinHeight="260" MaxHeight="760" HorizontalAlignment="Stretch">
+                                <Grid>
+                                    <SwapChainPanel x:Name="ClientDecodeSwapChainPanel">
+                                        <TextBlock x:Name="ClientDecodePlaceholder" Text="Aguardando D3D11..." Foreground="#8F9CA8" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                    </SwapChainPanel>
+                                    <!-- O cursor é transmitido separadamente do vídeo.
+                                         Assim ele continua suave sem forçar composição/cópia no NVENC. -->
+                                    <Canvas x:Name="RemoteCursorCanvas" Canvas.ZIndex="10" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" IsHitTestVisible="False">
+                                        <Path x:Name="RemoteCursorVisual" Width="12" Height="19" Visibility="Collapsed" Stretch="Uniform" Fill="#FFFFFF" Stroke="#000000" StrokeThickness="1" Data="M 1,1 L 1,22 L 6,17 L 11,27 L 15,25 L 10,15 L 18,15 Z"/>
+                                    </Canvas>
+                                </Grid>
+                            </Border>
+                            <Grid ColumnSpacing="12" RowSpacing="8">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+                                <TextBlock x:Name="DecoderFpsLabelTextBlock" Grid.Row="0" Text="D3D11 present FPS" Foreground="#8F9CA8" TextWrapping="Wrap"/>
+                                <TextBlock x:Name="DecoderFpsTextBlock" Grid.Row="0" Grid.Column="1" Text="-- FPS" Foreground="#E62D4F" FontWeight="SemiBold"/>
+                                <TextBlock Grid.Row="1" Text="Probe estágio presenter" Foreground="#8F9CA8" TextWrapping="Wrap"/>
+                                <TextBlock x:Name="DecoderProbeStageTextBlock" Grid.Row="1" Grid.Column="1" Text="--" Foreground="#FFF4EF" FontWeight="SemiBold"/>
+                                <TextBlock Grid.Row="2" Text="Probe foreground" Foreground="#8F9CA8" TextWrapping="Wrap"/>
+                                <TextBlock x:Name="DecoderProbeForegroundTextBlock" Grid.Row="2" Grid.Column="1" Text="--" Foreground="#FFF4EF" FontWeight="SemiBold"/>
+                                <TextBlock Grid.Row="3" Text="Latência NVDEC" Foreground="#8F9CA8" TextWrapping="Wrap"/>
+                                <TextBlock x:Name="DecoderLagTextBlock" Grid.Row="3" Grid.Column="1" Text="-- ms" Foreground="#FFF4EF" FontWeight="SemiBold"/>
+                                <TextBlock Grid.Row="4" Text="Fila atual/máxima • stale" Foreground="#8F9CA8" TextWrapping="Wrap"/>
+                                <TextBlock x:Name="DecoderDropTextBlock" Grid.Row="4" Grid.Column="1" Text="0" Foreground="#FFF4EF" FontWeight="SemiBold"/>
+                                <TextBlock Grid.Row="5" Text="Frames enviados ao NVDEC" Foreground="#8F9CA8" TextWrapping="Wrap"/>
+                                <TextBlock x:Name="DecoderSubmittedTextBlock" Grid.Row="5" Grid.Column="1" Text="0" Foreground="#FFF4EF" FontWeight="SemiBold"/>
+                                <TextBlock x:Name="DecoderRenderedLabelTextBlock" Grid.Row="6" Text="Frames apresentados D3D11" Foreground="#8F9CA8" TextWrapping="Wrap"/>
+                                <TextBlock x:Name="DecoderRenderedTextBlock" Grid.Row="6" Grid.Column="1" Text="0" Foreground="#FFF4EF" FontWeight="SemiBold"/>
+                                <TextBlock Grid.Row="7" Text="Probe waitable DXGI" Foreground="#8F9CA8" TextWrapping="Wrap"/>
+                                <TextBlock x:Name="DecoderPresentWaitTextBlock" Grid.Row="7" Grid.Column="1" Text="-- ms" Foreground="#FFF4EF" FontWeight="SemiBold"/>
+                                <TextBlock Grid.Row="8" Text="Frames antigos substituídos" Foreground="#8F9CA8" TextWrapping="Wrap"/>
+                                <TextBlock x:Name="DecoderLatestSkipTextBlock" Grid.Row="8" Grid.Column="1" Text="0" Foreground="#FFF4EF" FontWeight="SemiBold"/>
+                                <TextBlock Grid.Row="9" Text="Erros reais de Present" Foreground="#8F9CA8" TextWrapping="Wrap"/>
+                                <TextBlock x:Name="DecoderPresentErrorTextBlock" Grid.Row="9" Grid.Column="1" Text="0" Foreground="#FFF4EF" FontWeight="SemiBold"/>
+                                <TextBlock Grid.Row="10" Text="Probe fila → presenter" Foreground="#8F9CA8" TextWrapping="Wrap"/>
+                                <TextBlock x:Name="DecoderProbeQueueTextBlock" Grid.Row="10" Grid.Column="1" Text="-- ms" Foreground="#FFF4EF" FontWeight="SemiBold"/>
+                                <TextBlock Grid.Row="11" Text="Probe espera StateMutex" Foreground="#8F9CA8" TextWrapping="Wrap"/>
+                                <TextBlock x:Name="DecoderProbeStateLockTextBlock" Grid.Row="11" Grid.Column="1" Text="-- ms" Foreground="#FFF4EF" FontWeight="SemiBold"/>
+                                <TextBlock Grid.Row="12" Text="Probe chamada Present()" Foreground="#8F9CA8" TextWrapping="Wrap"/>
+                                <TextBlock x:Name="DecoderProbePresentCallTextBlock" Grid.Row="12" Grid.Column="1" Text="-- ms" Foreground="#FFF4EF" FontWeight="SemiBold"/>
+                                <TextBlock Grid.Row="13" Text="Probe idade no Present" Foreground="#8F9CA8" TextWrapping="Wrap"/>
+                                <TextBlock x:Name="DecoderProbeFrameAgeTextBlock" Grid.Row="13" Grid.Column="1" Text="-- ms" Foreground="#FFF4EF" FontWeight="SemiBold"/>
+                                <TextBlock Grid.Row="14" Text="Probe última atividade" Foreground="#8F9CA8" TextWrapping="Wrap"/>
+                                <TextBlock x:Name="DecoderProbeActivityTextBlock" Grid.Row="14" Grid.Column="1" Text="-- ms" Foreground="#FFF4EF" FontWeight="SemiBold"/>
+                                <TextBlock Grid.Row="15" Text="Probe contadores" Foreground="#8F9CA8" TextWrapping="Wrap"/>
+                                <TextBlock x:Name="DecoderProbeCountersTextBlock" Grid.Row="15" Grid.Column="1" MaxWidth="520" Text="--" Foreground="#FFF4EF" FontWeight="SemiBold" TextWrapping="Wrap"/>
+                            </Grid>
+                            <TextBlock x:Name="DecoderStatusTextBlock" Text="Decoder parado." Foreground="#8F9CA8" FontSize="10" TextWrapping="Wrap"/>
+                            <TextBlock Text="CORE 11.17f CLIENT PRESENTER • host 11.17e preservado • waitable gate 20 ms • sem DXGI_PRESENT_DO_NOT_WAIT." Foreground="#7E8A9B" FontSize="9" TextWrapping="Wrap"/>
+                        </StackPanel>
+                    </Border>
+                </Grid>
+            </Border>
+        </ScrollViewer>
+    </Grid>
+</Page>

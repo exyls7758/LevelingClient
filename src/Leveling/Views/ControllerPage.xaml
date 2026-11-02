@@ -1,0 +1,681 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<Page xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:ui="using:Multiverse.Services" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:tips="using:Multiverse.Services" xmlns:media="using:Microsoft.UI.Xaml.Media.Imaging" x:Class="Multiverse.Views.ControllerPage" Background="{StaticResource DesignBackground}" SizeChanged="ControllerPage_SizeChanged" KeyDown="ControllerPage_KeyDown" UseLayoutRounding="True">
+    <Page.Resources>
+        <Style x:Key="Card" TargetType="Border">
+            <Setter Property="Background" Value="{StaticResource DesignSurface}"/>
+            <Setter Property="BorderBrush" Value="{StaticResource DesignGlassEdge}"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="CornerRadius" Value="10"/>
+            <Setter Property="Padding" Value="16"/>
+        </Style>
+        <Style x:Key="Ghost" TargetType="Button">
+            <Setter Property="Background" Value="#1C252D"/>
+            <Setter Property="Foreground" Value="#FFF4EF"/>
+            <Setter Property="BorderBrush" Value="#34445A"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="CornerRadius" Value="9"/>
+            <Setter Property="Padding" Value="13,9"/>
+            <Setter Property="ui:InterfaceMotion.Enabled" Value="True"/>
+        </Style>
+        <Style x:Key="Primary" TargetType="Button">
+            <Setter Property="Background" Value="#33232B"/>
+            <Setter Property="Foreground" Value="#F55A7C"/>
+            <Setter Property="BorderBrush" Value="#8E2744"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="CornerRadius" Value="9"/>
+            <Setter Property="Padding" Value="13,9"/>
+            <Setter Property="ui:InterfaceMotion.Enabled" Value="True"/>
+        </Style>
+        <Style x:Key="Danger" TargetType="Button">
+            <Setter Property="Background" Value="#2A1319"/>
+            <Setter Property="Foreground" Value="#FF6B82"/>
+            <Setter Property="BorderBrush" Value="#7A2941"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="CornerRadius" Value="9"/>
+            <Setter Property="Padding" Value="13,9"/>
+            <Setter Property="ui:InterfaceMotion.Enabled" Value="True"/>
+        </Style>
+        <Style x:Key="SectionTitle" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="#E62D4F"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="CharacterSpacing" Value="70"/>
+        </Style>
+        <Style x:Key="FieldLabel" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="#B9C2C9"/>
+            <Setter Property="FontSize" Value="12"/>
+        </Style>
+        <Style x:Key="Subtle" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="#8F9CA8"/>
+            <Setter Property="FontSize" Value="11"/>
+        </Style>
+        <Style x:Key="StatusCard" TargetType="Border">
+            <Setter Property="Background" Value="#1C252D"/>
+            <Setter Property="BorderBrush" Value="#2D3C51"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="CornerRadius" Value="13"/>
+            <Setter Property="Padding" Value="16,13"/>
+        </Style>
+    </Page.Resources>
+    <Grid Background="{StaticResource DesignBackground}">
+        <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+            <StackPanel Margin="24,4,24,24" HorizontalAlignment="Stretch" Spacing="16">
+                <Border Background="Transparent" CornerRadius="0" MinHeight="72" BorderBrush="Transparent" BorderThickness="0">
+                    <Grid Background="Transparent" Padding="0,8,0,12">
+                        <Grid VerticalAlignment="Center">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="0"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="1" Margin="0" VerticalAlignment="Center" MaxWidth="430" HorizontalAlignment="Left">
+                                <TextBlock Text="Controle" Foreground="#FFF4EF" FontSize="28" FontWeight="Bold" CharacterSpacing="0" FontFamily="Segoe UI Variable Display" TextWrapping="Wrap"/>
+                                <TextBlock Text="Configure seu controle, permissões e resposta dos analógicos." Foreground="#8F9CA8" FontSize="11" TextWrapping="Wrap" Margin="0,5,0,0"/>
+                                
+                            </StackPanel>
+<StackPanel Grid.Column="2" Margin="16,0,0,0" VerticalAlignment="Center" Spacing="4" HorizontalAlignment="Left">
+                                    <TextBlock Text="VISUAL DO CONTROLE" Style="{StaticResource FieldLabel}" HorizontalAlignment="Left"/>
+                                    <ComboBox x:Name="ControllerSkinComboBox" ui:LevelingInfoToolTip.Text="Troca apenas o visual e o layout exibido entre Xbox e PS5/DualSense. O host continua usando o controle virtual compatível configurado pelo Leveling." Width="172" SelectionChanged="ControllerSkinComboBox_SelectionChanged">
+                                        <ComboBoxItem Content="Xbox"/>
+                                        <ComboBoxItem Content="PS5 / DualSense"/>
+                                    </ComboBox>
+                                </StackPanel>
+                        </Grid>
+                    </Grid>
+                </Border>
+                <!-- Header -->
+                <Grid x:Name="MainLayoutGrid" ColumnSpacing="14" RowSpacing="14">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="0"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="1.28*"/>
+                        <ColumnDefinition Width="1.0*"/>
+                    </Grid.ColumnDefinitions>
+                    <!-- LEFT: approved Xbox One visual -->
+                    <Border x:Name="ControllerVisualCard" Style="{StaticResource Card}" BorderBrush="#8B2743">
+                        <StackPanel Spacing="13">
+                            <Grid RowSpacing="12">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+                                <StackPanel>
+                                    <TextBlock x:Name="ControllerVisualModeTitleTextBlock" Text="XBOX 360 • INPUT LIVE" Style="{StaticResource SectionTitle}"/>
+                                    <TextBlock x:Name="ControllerStatusTextBlock" Text="Aguardando sessão." Foreground="#C4CCD8" FontSize="11" Margin="0,5,0,0" TextWrapping="Wrap"/>
+                                </StackPanel>
+                                <StackPanel Grid.Row="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                                    <ToggleSwitch x:Name="ControllerFeedbackToggle" Header="Feedback visual" IsOn="False" Toggled="ControllerFeedbackToggle_Toggled" OnContent="Ligado" OffContent="Desligado" VerticalAlignment="Center" FontSize="11"/>
+                                    <Border VerticalAlignment="Center" Background="{StaticResource DesignSurface}" BorderBrush="#96314F" BorderThickness="0" CornerRadius="10" Padding="14,6">
+                                        <TextBlock x:Name="ControllerRateTextBlock" Text="Xbox virtual" Foreground="#F55A7C" FontSize="11"/>
+                                    </Border>
+                                    <Button ui:InterfaceMotion.Enabled="True" x:Name="EditControllerLayoutButton" tips:LevelingInfoToolTip.Text="Abre o modo rápido para ajustar somente a posição e o tamanho das hitboxes dos analógicos. Use quando quiser alinhar os sticks sem editar o resto do controle." Content="Ajustar analógicos" Click="EditControllerLayoutButton_Click" Style="{StaticResource Primary}" Padding="12,6" FontSize="11" FontWeight="SemiBold"/>
+                                    <Button ui:InterfaceMotion.Enabled="True" x:Name="EditFullControllerLayoutButton" tips:LevelingInfoToolTip.Text="Abre o editor completo do layout para mover e redimensionar outras hitboxes do controle mostrado na tela. Isso altera apenas a interface interativa do Leveling." Content="Editar controle" Click="EditFullControllerLayoutButton_Click" Style="{StaticResource Ghost}" Padding="12,6" FontSize="11" FontWeight="SemiBold"/>
+                                </StackPanel>
+                            </Grid>
+                            <Border x:Name="ControllerLayoutEditorBar" Visibility="Collapsed" Background="{StaticResource DesignSurface}" BorderBrush="#721B32" BorderThickness="0" CornerRadius="12" Padding="12,10">
+                                <Grid RowSpacing="10">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                    </Grid.RowDefinitions>
+                                    <!-- Coordinates and fine adjustments can scroll, but action buttons never leave the viewport. -->
+                                    <ScrollViewer Grid.Row="0" HorizontalScrollBarVisibility="Auto" HorizontalScrollMode="Enabled" VerticalScrollBarVisibility="Disabled">
+                                        <StackPanel Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
+                                            <StackPanel MinWidth="220" Spacing="2" VerticalAlignment="Center">
+                                                <TextBlock x:Name="LayoutEditorModeTitle" Text="AJUSTE DA HITBOX DOS ANALÓGICOS" Foreground="#E62D4F" FontSize="11" FontWeight="SemiBold"/>
+                                                <TextBlock x:Name="LayoutSelectedElementText" Text="Clique em um analógico" Foreground="#FFF4EF" FontSize="11"/>
+                                            </StackPanel>
+                                            <TextBlock Text="X" Foreground="#8F9CA8" VerticalAlignment="Center"/>
+                                            <NumberBox x:Name="LayoutXNumberBox" tips:LevelingInfoToolTip.Text="Move horizontalmente a hitbox selecionada no editor. Altera apenas a posição visual/interativa do controle, não a transmissão." Width="92" SpinButtonPlacementMode="Compact" SmallChange="1" ValueChanged="LayoutNumberBox_ValueChanged"/>
+                                            <TextBlock Text="Y" Foreground="#8F9CA8" VerticalAlignment="Center"/>
+                                            <NumberBox x:Name="LayoutYNumberBox" tips:LevelingInfoToolTip.Text="Move verticalmente a hitbox selecionada no editor. Altera apenas a posição visual/interativa do controle, não a transmissão." Width="92" SpinButtonPlacementMode="Compact" SmallChange="1" ValueChanged="LayoutNumberBox_ValueChanged"/>
+                                            <StackPanel x:Name="LayoutSizeControls" Orientation="Horizontal" Spacing="8" Visibility="Collapsed">
+                                                <TextBlock Text="W" Foreground="#8F9CA8" VerticalAlignment="Center"/>
+                                                <NumberBox x:Name="LayoutWidthNumberBox" tips:LevelingInfoToolTip.Text="Altera a largura da hitbox selecionada. Use para fazer a área clicável acompanhar exatamente o botão ou analógico da arte." Width="88" Minimum="20" SpinButtonPlacementMode="Compact" SmallChange="1" ValueChanged="LayoutNumberBox_ValueChanged"/>
+                                                <TextBlock Text="H" Foreground="#8F9CA8" VerticalAlignment="Center"/>
+                                                <NumberBox x:Name="LayoutHeightNumberBox" tips:LevelingInfoToolTip.Text="Altera a altura da hitbox selecionada. Use para fazer a área clicável acompanhar exatamente o botão ou analógico da arte." Width="88" Minimum="20" SpinButtonPlacementMode="Compact" SmallChange="1" ValueChanged="LayoutNumberBox_ValueChanged"/>
+                                            </StackPanel>
+                                            <TextBlock x:Name="LayoutCoordinatesText" Text="X -- • Y -- • Centro X -- • Centro Y --" Foreground="#FF7F96" MinWidth="315" VerticalAlignment="Center"/>
+                                        </StackPanel>
+                                    </ScrollViewer>
+                                    <Grid Grid.Row="1" ColumnSpacing="14">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock x:Name="LayoutEditorInstructionText" Text="Arraste o anel ou use as setas para mover 1 px." Foreground="#7F8B9A" FontSize="11" VerticalAlignment="Center" TextWrapping="Wrap" Margin="2,0,12,0"/>
+                                        <StackPanel x:Name="AnalogEditorActionPanel" Grid.Column="1" Orientation="Horizontal" Spacing="8" HorizontalAlignment="Right">
+                                            <Button ui:InterfaceMotion.Enabled="True" x:Name="SaveAnalogAlignmentButton" tips:LevelingInfoToolTip.Text="Salva o alinhamento atual dos analógicos como novo padrão desta skin. As próximas vezes que você abrir o controle, essas posições serão usadas." Content="Salvar alinhamento" Click="SaveControllerLayoutButton_Click" Style="{StaticResource Primary}" MinWidth="138" Padding="14,8"/>
+                                            <Button ui:InterfaceMotion.Enabled="True" x:Name="CancelAnalogAlignmentButton" tips:LevelingInfoToolTip.Text="Descarta as alterações do modo de ajuste dos analógicos e volta para o último layout salvo." Content="Cancelar" Click="CancelControllerLayoutButton_Click" Style="{StaticResource Ghost}" MinWidth="92" Padding="14,8"/>
+                                            <Button ui:InterfaceMotion.Enabled="True" x:Name="ResetAnalogAlignmentButton" tips:LevelingInfoToolTip.Text="Restaura as posições padrão dos analógicos para a skin atual, desfazendo alinhamentos personalizados não salvos." Content="Restaurar padrão" Click="ResetControllerLayoutButton_Click" Style="{StaticResource Ghost}" MinWidth="138" Padding="14,8"/>
+                                        </StackPanel>
+                                        <StackPanel x:Name="FullEditorActionPanel" Grid.Column="1" Orientation="Horizontal" Spacing="8" HorizontalAlignment="Right" Visibility="Collapsed">
+                                            <Button ui:InterfaceMotion.Enabled="True" x:Name="SaveFullLayoutButton" tips:LevelingInfoToolTip.Text="Salva o layout completo editado da skin atual, incluindo posições e tamanhos das hitboxes ajustadas no editor." Content="Salvar layout" Click="SaveControllerLayoutButton_Click" Style="{StaticResource Primary}" MinWidth="122" Padding="14,8"/>
+                                            <Button ui:InterfaceMotion.Enabled="True" x:Name="CancelFullLayoutButton" tips:LevelingInfoToolTip.Text="Cancela a edição completa do controle e volta para o último layout salvo desta skin." Content="Cancelar" Click="CancelControllerLayoutButton_Click" Style="{StaticResource Ghost}" MinWidth="92" Padding="14,8"/>
+                                            <Button ui:InterfaceMotion.Enabled="True" x:Name="ResetFullLayoutButton" tips:LevelingInfoToolTip.Text="Restaura o layout completo original da skin atual, removendo ajustes personalizados de posição e tamanho." Content="Restaurar padrão" Click="ResetControllerLayoutButton_Click" Style="{StaticResource Ghost}" MinWidth="138" Padding="14,8"/>
+                                        </StackPanel>
+                                    </Grid>
+                                </Grid>
+                            </Border>
+                            <!-- Shoulder controls intentionally live above the SVG, per the approved layout. -->
+                            <Grid x:Name="ShoulderStrip" Margin="36,0,36,4" ColumnSpacing="10">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="118"/>
+                                    <ColumnDefinition Width="118"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="118"/>
+                                    <ColumnDefinition Width="118"/>
+                                </Grid.ColumnDefinitions>
+                                <Border x:Name="LtSurface" Grid.Column="0" Tag="LT" Tapped="ControllerPart_Tapped" ToolTipService.ToolTip="LT • deadzone e leitura em tempo real" Height="38" Background="{StaticResource DesignSurface}" BorderBrush="#8F2C4A" BorderThickness="1.4" CornerRadius="10">
+                                    <Grid>
+                                        <Border x:Name="LtFill" Width="0" HorizontalAlignment="Left" Background="#68EF2B56" CornerRadius="17"/>
+                                        <Border x:Name="LtDeadzoneOverlay" Width="0" HorizontalAlignment="Left" Background="#74F3B260" CornerRadius="17,0,0,17"/>
+                                        <TextBlock x:Name="LtLabelTextBlock" Text="LT" Foreground="#FFF4EF" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="11" FontWeight="SemiBold"/>
+                                    </Grid>
+                                </Border>
+                                <Border x:Name="LbOrb" Grid.Column="1" Tag="LB" Tapped="ControllerPart_Tapped" ToolTipService.ToolTip="LB • clique para remapear" Height="38" Background="{StaticResource DesignSurface}" BorderBrush="#374659" BorderThickness="1.3" CornerRadius="10">
+                                    <TextBlock x:Name="LbLabelTextBlock" Text="LB" Foreground="#C9D3CF" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="11" FontWeight="SemiBold"/>
+                                </Border>
+                                <Border x:Name="RbOrb" Grid.Column="3" Tag="RB" Tapped="ControllerPart_Tapped" ToolTipService.ToolTip="RB • clique para remapear" Height="38" Background="{StaticResource DesignSurface}" BorderBrush="#374659" BorderThickness="1.3" CornerRadius="10">
+                                    <TextBlock x:Name="RbLabelTextBlock" Text="RB" Foreground="#C9D3CF" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="11" FontWeight="SemiBold"/>
+                                </Border>
+                                <Border x:Name="RtSurface" Grid.Column="4" Tag="RT" Tapped="ControllerPart_Tapped" ToolTipService.ToolTip="RT • deadzone e leitura em tempo real" Height="38" Background="#141928" BorderBrush="#5B4D86" BorderThickness="1.4" CornerRadius="10">
+                                    <Grid>
+                                        <Border x:Name="RtFill" Width="0" HorizontalAlignment="Left" Background="#686E66FF" CornerRadius="17"/>
+                                        <Border x:Name="RtDeadzoneOverlay" Width="0" HorizontalAlignment="Left" Background="#74F3B260" CornerRadius="17,0,0,17"/>
+                                        <TextBlock x:Name="RtLabelTextBlock" Text="RT" Foreground="#FFF4EF" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="11" FontWeight="SemiBold"/>
+                                    </Grid>
+                                </Border>
+                            </Grid>
+                            <Grid x:Name="ControllerStageGrid" MinHeight="0">
+                                <Viewbox Stretch="Uniform" HorizontalAlignment="Stretch" VerticalAlignment="Top">
+                                    <Canvas x:Name="ControllerVectorStage" Width="2048" Height="1422">
+                                        <Image x:Name="ControllerBaseImage" Width="2048" Height="1422" Canvas.Left="0" Canvas.Top="0" IsHitTestVisible="False" Opacity="0.985" Stretch="Fill" UseLayoutRounding="True">
+                                            <Image.Source>
+                                                <media:BitmapImage UriSource="ms-appx:///Assets/ControllerBase.png"/>
+                                            </Image.Source>
+                                        </Image>
+                                        <Image x:Name="ControllerPs5Image" Width="2048" Height="1384.448" Canvas.Left="0" Canvas.Top="18.776" IsHitTestVisible="False" Visibility="Collapsed" Opacity="0.985" Stretch="Fill" UseLayoutRounding="True">
+                                            <Image.Source>
+                                                <media:BitmapImage UriSource="ms-appx:///Assets/ControllerPs5.png"/>
+                                            </Image.Source>
+                                        </Image>
+                                        <Image x:Name="ControllerShellImage" Width="2048" Height="1422" Canvas.Left="0" Canvas.Top="0" IsHitTestVisible="False" Visibility="Collapsed" Opacity="0.985" Stretch="Fill">
+                                            <Image.Source>
+                                                <media:SvgImageSource UriSource="ms-appx:///Assets/ControllerShell.svg"/>
+                                            </Image.Source>
+                                        </Image>
+                                        <!-- Exact interactive hit-zones measured from the supplied SVG. -->
+                                        <Border x:Name="LeftStickSurface" Tag="LEFT_STICK" Tapped="ControllerPart_Tapped" ToolTipService.ToolTip="Analógico esquerdo • deadzone, outer, anti-deadzone, curva e Y" Width="304.702" Height="304.893" Canvas.Left="341.35" Canvas.Top="235.85" Background="#00000000" BorderBrush="#00000000" BorderThickness="3.75" CornerRadius="182.5">
+                                            <Canvas Width="304.702" Height="304.893">
+                                                <Grid x:Name="LeftStickCustomBody" Width="304.702" Height="304.893" Visibility="Collapsed" IsHitTestVisible="False">
+                                                    <Ellipse Width="272" Height="272" Fill="#31363B" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                    <Ellipse Width="236" Height="236" Fill="#050505" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                    <Ellipse Width="214" Height="214" Fill="#20252A" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                    <Ellipse Width="154" Height="154" Fill="#1C1D21" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                </Grid>
+                                                <Ellipse x:Name="LeftStickPhysicalGuide" Width="235.020" Height="235.167" Canvas.Left="34.841" Canvas.Top="34.863" Fill="Transparent" Stroke="#666A7285" StrokeThickness="2.50" Opacity="0.55" IsHitTestVisible="False" Visibility="Collapsed"/>
+                                                <Ellipse x:Name="LeftStickAlignmentGuide" Width="255" Height="255" Canvas.Left="24.85" Canvas.Top="24.95" Fill="#10EF2B56" Stroke="#E62D4F" StrokeThickness="5" Opacity="0.85" Visibility="Collapsed" IsHitTestVisible="False"/>
+                                                <Ellipse x:Name="LeftStickOuterRing" Width="235.020" Height="235.167" Canvas.Left="34.841" Canvas.Top="34.863" Fill="Transparent" Stroke="#E62D4F" StrokeThickness="4.62" Opacity="0.86" Visibility="Collapsed"/>
+                                                <Ellipse x:Name="LeftStickDeadzoneRing" Width="1" Height="1" Canvas.Left="151.102" Canvas.Top="151.197" Fill="#1EEF2B56" Stroke="#FF7F96" StrokeThickness="4.00" Visibility="Collapsed"/>
+                                                <Ellipse x:Name="LeftStickAntiRing" Width="1" Height="1" Canvas.Left="151.102" Canvas.Top="151.197" Fill="Transparent" Stroke="#A289FF" StrokeThickness="3.50" Visibility="Collapsed"/>
+                                                <Ellipse x:Name="LeftStickLiveDot" Width="74.927" Height="74.974" Canvas.Left="114.888" Canvas.Top="114.960" Fill="#85EF2B56" Stroke="#FFC7D2" StrokeThickness="3.50" IsHitTestVisible="False" Visibility="Collapsed"/>
+                                                <Border x:Name="LeftStickClickTarget" Tag="L3" Tapped="ControllerPart_Tapped" ToolTipService.ToolTip="L3 • clique para remapear" Width="104.898" Height="104.963" Canvas.Left="99.902" Canvas.Top="99.965" Background="#00000000" BorderBrush="#00000000" BorderThickness="4.00" CornerRadius="57.4"/>
+                                            </Canvas>
+                                        </Border>
+                                        <Border x:Name="BackButtonOrb" Tag="BACK" Tapped="ControllerPart_Tapped" ToolTipService.ToolTip="View / Back • clique para remapear" Width="89.912" Height="89.968" Canvas.Left="826.693" Canvas.Top="342.380" Background="#00000000" BorderBrush="#00000000" BorderThickness="3.50" CornerRadius="45">
+                                            <Grid x:Name="BackButtonCustomVisual" Visibility="Collapsed" IsHitTestVisible="False">
+                                                <Ellipse Fill="#E831363B"/>
+                                                <TextBlock Text="▣" Foreground="White" FontSize="24" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                            </Grid>
+                                        </Border>
+                                        <Border x:Name="StartButtonOrb" Tag="START" Tapped="ControllerPart_Tapped" ToolTipService.ToolTip="Menu / Start • clique para remapear" Width="89.912" Height="89.968" Canvas.Left="1131.395" Canvas.Top="342.380" Background="#00000000" BorderBrush="#00000000" BorderThickness="3.50" CornerRadius="45">
+                                            <Grid x:Name="StartButtonCustomVisual" Visibility="Collapsed" IsHitTestVisible="False">
+                                                <Ellipse Fill="#E831363B"/>
+                                                <TextBlock Text="☰" Foreground="White" FontSize="24" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                            </Grid>
+                                        </Border>
+                                        <Border x:Name="YButtonOrb" Tag="Y" Tapped="ControllerPart_Tapped" ToolTipService.ToolTip="Y • clique para configurar o mapeamento" Width="144.859" Height="144.949" Canvas.Left="1481.054" Canvas.Top="172.439" Background="#00000000" BorderBrush="#00000000" BorderThickness="4.00" CornerRadius="72.5">
+                                            <Grid x:Name="YButtonCustomVisual" Visibility="Collapsed" IsHitTestVisible="False">
+                                                <Ellipse Fill="#E8050505"/>
+                                                <TextBlock Text="Y" Foreground="#DDB42C" FontSize="70" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                            </Grid>
+                                        </Border>
+                                        <Border x:Name="XButtonOrb" Tag="X" Tapped="ControllerPart_Tapped" ToolTipService.ToolTip="X • clique para configurar o mapeamento" Width="144.859" Height="144.949" Canvas.Left="1338.693" Canvas.Top="314.889" Background="#00000000" BorderBrush="#00000000" BorderThickness="4.00" CornerRadius="72.5">
+                                            <Grid x:Name="XButtonCustomVisual" Visibility="Collapsed" IsHitTestVisible="False">
+                                                <Ellipse Fill="#E8050505"/>
+                                                <TextBlock Text="X" Foreground="#009CD3" FontSize="70" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                            </Grid>
+                                        </Border>
+                                        <Border x:Name="BButtonOrb" Tag="B" Tapped="ControllerPart_Tapped" ToolTipService.ToolTip="B • clique para configurar o mapeamento" Width="144.859" Height="144.949" Canvas.Left="1633.405" Canvas.Top="314.889" Background="#00000000" BorderBrush="#00000000" BorderThickness="4.00" CornerRadius="72.5">
+                                            <Grid x:Name="BButtonCustomVisual" Visibility="Collapsed" IsHitTestVisible="False">
+                                                <Ellipse Fill="#E8050505"/>
+                                                <TextBlock Text="B" Foreground="#CF3930" FontSize="70" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                            </Grid>
+                                        </Border>
+                                        <Border x:Name="AButtonOrb" Tag="A" Tapped="ControllerPart_Tapped" ToolTipService.ToolTip="A • clique para configurar o mapeamento" Width="144.859" Height="144.949" Canvas.Left="1481.054" Canvas.Top="457.339" Background="#00000000" BorderBrush="#00000000" BorderThickness="4.00" CornerRadius="72.5">
+                                            <Grid x:Name="AButtonCustomVisual" Visibility="Collapsed" IsHitTestVisible="False">
+                                                <Ellipse Fill="#E8050505"/>
+                                                <TextBlock Text="A" Foreground="#88BF57" FontSize="70" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                            </Grid>
+                                        </Border>
+                                        <Grid x:Name="DpadContainer" Width="349.659" Height="349.877" Canvas.Left="574.439" Canvas.Top="549.807">
+                                            <Grid x:Name="DpadCustomVisual" Visibility="Collapsed" IsHitTestVisible="False">
+                                                <Ellipse Width="320" Height="320" Fill="#181C20" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                <Border Width="108" Height="300" Background="#101010" CornerRadius="10" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                <Border Width="300" Height="108" Background="#101010" CornerRadius="10" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                            </Grid>
+                                            <Border x:Name="DpadUp" Tag="DPAD_UP" Tapped="ControllerPart_Tapped" ToolTipService.ToolTip="D-pad ↑ • clique para remapear" Width="109.893" Height="144.949" Background="#00000000" BorderBrush="#00000000" BorderThickness="3.50" CornerRadius="17.5" HorizontalAlignment="Center" VerticalAlignment="Top"/>
+                                            <Border x:Name="DpadDown" Tag="DPAD_DOWN" Tapped="ControllerPart_Tapped" ToolTipService.ToolTip="D-pad ↓ • clique para remapear" Width="109.893" Height="144.949" Background="#00000000" BorderBrush="#00000000" BorderThickness="3.50" CornerRadius="17.5" HorizontalAlignment="Center" VerticalAlignment="Bottom"/>
+                                            <Border x:Name="DpadLeft" Tag="DPAD_LEFT" Tapped="ControllerPart_Tapped" ToolTipService.ToolTip="D-pad ← • clique para remapear" Width="144.859" Height="109.961" Background="#00000000" BorderBrush="#00000000" BorderThickness="3.50" CornerRadius="17.5" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                                            <Border x:Name="DpadRight" Tag="DPAD_RIGHT" Tapped="ControllerPart_Tapped" ToolTipService.ToolTip="D-pad → • clique para remapear" Width="144.859" Height="109.961" Background="#00000000" BorderBrush="#00000000" BorderThickness="3.50" CornerRadius="17.5" HorizontalAlignment="Right" VerticalAlignment="Center"/>
+                                        </Grid>
+                                        <Border x:Name="RightStickSurface" Tag="RIGHT_STICK" Tapped="ControllerPart_Tapped" ToolTipService.ToolTip="Analógico direito • deadzone, outer, anti-deadzone, curva e Y" Width="304.702" Height="304.893" Canvas.Left="1140.30" Canvas.Top="546.91" Background="#00000000" BorderBrush="#00000000" BorderThickness="3.75" CornerRadius="182.5">
+                                            <Canvas Width="304.702" Height="304.893">
+                                                <Grid x:Name="RightStickCustomBody" Width="304.702" Height="304.893" Visibility="Collapsed" IsHitTestVisible="False">
+                                                    <Ellipse Width="272" Height="272" Fill="#31363B" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                    <Ellipse Width="236" Height="236" Fill="#050505" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                    <Ellipse Width="214" Height="214" Fill="#20252A" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                    <Ellipse Width="154" Height="154" Fill="#1C1D21" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                </Grid>
+                                                <Ellipse x:Name="RightStickPhysicalGuide" Width="235.020" Height="235.167" Canvas.Left="34.841" Canvas.Top="34.863" Fill="Transparent" Stroke="#666D6B86" StrokeThickness="2.50" Opacity="0.55" IsHitTestVisible="False" Visibility="Collapsed"/>
+                                                <Ellipse x:Name="RightStickAlignmentGuide" Width="255" Height="255" Canvas.Left="24.85" Canvas.Top="24.95" Fill="#107B70FF" Stroke="#8F85FF" StrokeThickness="5" Opacity="0.85" Visibility="Collapsed" IsHitTestVisible="False"/>
+                                                <Ellipse x:Name="RightStickOuterRing" Width="235.020" Height="235.167" Canvas.Left="34.841" Canvas.Top="34.863" Fill="Transparent" Stroke="#7B70FF" StrokeThickness="4.62" Opacity="0.9" Visibility="Collapsed"/>
+                                                <Ellipse x:Name="RightStickDeadzoneRing" Width="1" Height="1" Canvas.Left="151.102" Canvas.Top="151.197" Fill="#1E6E66FF" Stroke="#A89FFF" StrokeThickness="4.00" Visibility="Collapsed"/>
+                                                <Ellipse x:Name="RightStickAntiRing" Width="1" Height="1" Canvas.Left="151.102" Canvas.Top="151.197" Fill="Transparent" Stroke="#FF8EA4" StrokeThickness="3.50" Visibility="Collapsed"/>
+                                                <Ellipse x:Name="RightStickLiveDot" Width="74.927" Height="74.974" Canvas.Left="114.888" Canvas.Top="114.960" Fill="#856E66FF" Stroke="#C8C0FF" StrokeThickness="3.50" IsHitTestVisible="False" Visibility="Collapsed"/>
+                                                <Border x:Name="RightStickClickTarget" Tag="R3" Tapped="ControllerPart_Tapped" ToolTipService.ToolTip="R3 • clique para remapear" Width="104.898" Height="104.963" Canvas.Left="99.902" Canvas.Top="99.965" Background="#00000000" BorderBrush="#00000000" BorderThickness="4.00" CornerRadius="57.4"/>
+                                            </Canvas>
+                                        </Border>
+                                    </Canvas>
+                                </Viewbox>
+                            </Grid>
+                            <Border Background="#0F141E" BorderBrush="#303B45" BorderThickness="0" CornerRadius="11" Padding="13,9" Margin="18,-2,18,0" Height="38">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Text="ⓘ" Foreground="#E62D4F" FontSize="13" VerticalAlignment="Center"/>
+                                    <TextBlock x:Name="SelectedPartHintTextBlock" Grid.Column="1" Text="Clique em qualquer botão para remapear • sticks e gatilhos mostram o efeito das configurações em tempo real." Foreground="#82958D" FontSize="11" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis" Margin="9,0,0,0" VerticalAlignment="Center"/>
+                                </Grid>
+                            </Border>
+                            <!-- Three status cards, matching the approved reference. -->
+                            <Grid ColumnSpacing="12">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Border Style="{StaticResource StatusCard}">
+                                    <StackPanel Spacing="5">
+                                        <TextBlock Text="⌁  LATÊNCIA INPUT" Foreground="#B9C2C9" FontSize="11" FontWeight="SemiBold"/>
+                                        <TextBlock x:Name="LatencyCardValueTextBlock" Text="-- ms" Foreground="#F55A7C" FontSize="20" FontWeight="SemiBold"/>
+                                        <TextBlock Text="Tempo do pacote mais recente" Style="{StaticResource Subtle}"/>
+                                    </StackPanel>
+                                </Border>
+                                <Border Grid.Column="1" Style="{StaticResource StatusCard}">
+                                    <StackPanel Spacing="5">
+                                        <TextBlock Text="◇  PACOTES" Foreground="#B9C2C9" FontSize="11" FontWeight="SemiBold"/>
+                                        <TextBlock x:Name="PacketCardValueTextBlock" Text="TX 0  •  RX 0" Foreground="#FFF4EF" FontSize="17" FontWeight="SemiBold"/>
+                                        <TextBlock Text="latest-wins • input 250 Hz" Style="{StaticResource Subtle}"/>
+                                    </StackPanel>
+                                </Border>
+                                <Border Grid.Column="2" Style="{StaticResource StatusCard}">
+                                    <StackPanel Spacing="5">
+                                        <TextBlock Text="♢  STATUS" Foreground="#B9C2C9" FontSize="11" FontWeight="SemiBold"/>
+                                        <TextBlock x:Name="SafetyCardValueTextBlock" Text="Watchdog 250 ms" Foreground="#F55A7C" FontSize="16" FontWeight="SemiBold"/>
+                                        <TextBlock Text="Ativo e monitorando" Style="{StaticResource Subtle}"/>
+                                    </StackPanel>
+                                </Border>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+                    <!-- RIGHT: same approved controls, all functional. -->
+                    <Border x:Name="ControllerSettingsCard" Grid.Column="1" Background="Transparent" Padding="0">
+                        <StackPanel Spacing="15">
+                            <Grid>
+<ui:CornerGlow AroundCard="True" Width="220" Height="140" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,-36,-28,0"/>
+<Border Style="{StaticResource DesignCard}" Padding="16">
+                                <StackPanel Spacing="12">
+                                    <StackPanel>
+                                        <TextBlock Text="ROTEAMENTO" Style="{StaticResource SectionTitle}"/>
+                                        <TextBlock Text="Controle remoto" Foreground="#FFF4EF" FontSize="18" FontWeight="SemiBold" Margin="0,5,0,0"/>
+                                        <TextBlock Text="Escolha qual controle do cliente será lido e em qual jogador ele deve aparecer no host." Foreground="#8F9CA8" FontSize="11" TextWrapping="Wrap" Margin="0,4,0,0"/>
+                                        <TextBlock x:Name="RoleScopeHintTextBlock" Text="Sem sessão ativa: você pode preparar as opções de cliente e host antes de conectar." Foreground="#8F9CA8" FontSize="11" TextWrapping="Wrap" Margin="0,5,0,0"/>
+                                    </StackPanel>
+                                    <Grid ColumnSpacing="11">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="0.9*"/>
+                                            <ColumnDefinition Width="1.1*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <Border Background="{StaticResource DesignSurface}" BorderBrush="#303B45" BorderThickness="0" CornerRadius="10" Padding="11,7">
+                                            <StackPanel Spacing="4">
+                                                <ToggleSwitch x:Name="RemoteInputToggle" tips:LevelingInfoToolTip.Text="No cliente, controla o envio do controle físico. No host, controla se o Leveling aceita os pacotes de controle recebidos." Header="Aceitar input remoto" IsOn="True" Toggled="RemoteInputToggle_Toggled"/>
+                                                <TextBlock x:Name="RemoteInputPermissionTextBlock" Text="" Foreground="#FFB15A" FontSize="11" TextWrapping="Wrap" Visibility="Collapsed"/>
+                                            </StackPanel>
+                                        </Border>
+                                        <StackPanel Grid.Column="1" Spacing="8">
+                                            <StackPanel Spacing="4">
+                                                <TextBlock Text="Controle no cliente" Style="{StaticResource FieldLabel}"/>
+                                                <ComboBox x:Name="ClientSourceComboBox" tips:LevelingInfoToolTip.Text="Escolhe qual controle físico do cliente será lido. Automático tenta XInput primeiro e também aceita DualSense/HID compatível. DualSense / HID (Sony) força a leitura do controle PlayStation compatível quando disponível." SelectedIndex="0" SelectionChanged="ClientSourceComboBox_SelectionChanged">
+                                                    <ComboBoxItem Content="Automático (XInput + DualSense/HID)"/>
+                                                    <ComboBoxItem Content="DualSense / HID (Sony)"/>
+                                                    <ComboBoxItem Content="XInput 1"/>
+                                                    <ComboBoxItem Content="XInput 2"/>
+                                                    <ComboBoxItem Content="XInput 3"/>
+                                                    <ComboBoxItem Content="XInput 4"/>
+                                                </ComboBox>
+                                            </StackPanel>
+                                            <StackPanel Spacing="4">
+                                                <TextBlock Text="Jogador no host" Style="{StaticResource FieldLabel}"/>
+                                                <ComboBox x:Name="HostSlotComboBox" tips:LevelingInfoToolTip.Text="Escolhe em qual jogador o controle virtual aparece no host. Automático usa o próximo slot disponível; P1 a P4 forçam um jogador específico no Xbox virtual do host." SelectedIndex="0" SelectionChanged="HostSlotComboBox_SelectionChanged">
+                                                    <ComboBoxItem Content="Automático"/>
+                                                    <ComboBoxItem Content="Jogador 1 (P1)"/>
+                                                    <ComboBoxItem Content="Jogador 2 (P2)"/>
+                                                    <ComboBoxItem Content="Jogador 3 (P3)"/>
+                                                    <ComboBoxItem Content="Jogador 4 (P4)"/>
+                                                </ComboBox>
+                                            </StackPanel>
+                                        </StackPanel>
+                                    </Grid>
+                                </StackPanel>
+                            </Border>
+</Grid>
+                            <Border Background="{StaticResource DesignSurface}" BorderBrush="#3A2230" BorderThickness="0" CornerRadius="13" Padding="13">
+                                <StackPanel Spacing="9">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <StackPanel>
+                                            <TextBlock Text="SAÚDE DO CONTROLE" Foreground="#B9C2C9" FontSize="11" FontWeight="SemiBold" CharacterSpacing="55"/>
+                                            <TextBlock Text="Diagnóstico guiado • eixos identificados por movimento" Foreground="#7E8A9B" FontSize="11" Margin="0,3,0,0"/>
+                                            <TextBlock Text="Execute no PC que está com o controle físico. Funciona mesmo sem sessão." Foreground="#8F9CA8" FontSize="11" Margin="0,2,0,0" TextWrapping="Wrap"/>
+                                        </StackPanel>
+                                        <Button ui:InterfaceMotion.Enabled="True" x:Name="DiagnosticControllerButton" Grid.Column="1" Content="DIAGNOSTICAR CONTROLE" Style="{StaticResource Primary}" Padding="12,7" FontSize="11" FontWeight="SemiBold" Click="DiagnosticControllerButton_Click" tips:LevelingInfoToolTip.Text="Abre um assistente guiado que avança quando reconhece cada ação no controle. Durante uma sessão CLIENTE, os movimentos de calibração são neutralizados antes de serem enviados ao host."/>
+                                    </Grid>
+                                    <Border x:Name="DiagnosticPanel" Visibility="Collapsed" Background="{StaticResource DesignField}" BorderBrush="#721B32" BorderThickness="0" CornerRadius="10" Padding="16">
+                                        <Grid x:Name="DiagnosticWizardOverlay" RowSpacing="12">
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="Auto"/>
+                                                <RowDefinition Height="Auto"/>
+                                                <RowDefinition Height="Auto"/>
+                                                <RowDefinition Height="Auto"/>
+                                                <RowDefinition Height="Auto"/>
+                                            </Grid.RowDefinitions>
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                </Grid.ColumnDefinitions>
+                                                <StackPanel Spacing="3">
+                                                    <TextBlock x:Name="DiagnosticStageTitleTextBlock" Text="ASSISTENTE DE DIAGNÓSTICO" Foreground="#E62D4F" FontSize="11" FontWeight="SemiBold" CharacterSpacing="45"/>
+                                                    <TextBlock x:Name="DiagnosticInstructionTextBlock" Text="O Leveling só avança quando reconhecer a ação pedida." Foreground="#9EA9B8" FontSize="11" TextWrapping="Wrap"/>
+                                                </StackPanel>
+                                                <Border Grid.Column="1" Background="{StaticResource DesignSurface}" BorderBrush="#34445A" BorderThickness="0" CornerRadius="10" Padding="9,5" VerticalAlignment="Top">
+                                                    <TextBlock x:Name="DiagnosticCountdownTextBlock" Text="AO VIVO" Foreground="#F55A7C" FontSize="11" FontWeight="SemiBold"/>
+                                                </Border>
+                                            </Grid>
+                                            <Border Grid.Row="1" Background="{StaticResource DesignSurface}" BorderBrush="#2D3C51" BorderThickness="0" CornerRadius="13" Padding="16,14">
+                                                <Grid ColumnSpacing="16">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="0.72*"/>
+                                                        <ColumnDefinition Width="1.28*"/>
+                                                    </Grid.ColumnDefinitions>
+                                                    <StackPanel Spacing="8">
+                                                        <TextBlock Text="PROGRESSO" Foreground="#7E8A9B" FontSize="11" FontWeight="SemiBold" CharacterSpacing="45"/>
+                                                        <TextBlock x:Name="DiagnosticStepListTextBlock" Text="● Detectar controle&#10;○ Repouso estável&#10;○ Analógico esquerdo&#10;○ Analógico direito&#10;○ L2 / LT&#10;○ R2 / RT&#10;○ Resultado" Foreground="#C9D1DC" FontSize="11" LineHeight="21" TextWrapping="Wrap"/>
+                                                        <ProgressBar x:Name="DiagnosticProgressBar" Minimum="0" Maximum="100" Value="0" Height="5" Margin="0,4,0,0"/>
+                                                    </StackPanel>
+                                                    <StackPanel Grid.Column="1" Spacing="7" VerticalAlignment="Center">
+                                                        <TextBlock Text="FAÇA AGORA" Foreground="#E62D4F" FontSize="11" FontWeight="SemiBold" CharacterSpacing="55"/>
+                                                        <TextBlock x:Name="DiagnosticActionTitleTextBlock" Text="Conecte o controle" Foreground="#FFF4EF" FontSize="18" FontWeight="Bold" TextWrapping="Wrap"/>
+                                                        <TextBlock x:Name="DiagnosticActionHintTextBlock" Text="A instrução muda automaticamente quando o Leveling reconhecer a ação." Foreground="#B6C0CD" FontSize="11.5" TextWrapping="Wrap" MaxWidth="420"/>
+                                                        <TextBlock x:Name="DiagnosticStatusTextBlock" Text="Aguardando início." Foreground="#8F9CA8" FontSize="11" TextWrapping="Wrap"/>
+                                                    </StackPanel>
+                                                </Grid>
+                                            </Border>
+                                            <Grid Grid.Row="2" ColumnSpacing="10">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="0.9*"/>
+                                                </Grid.ColumnDefinitions>
+                                                <Border Background="{StaticResource DesignSurface}" BorderBrush="#303B45" BorderThickness="0" CornerRadius="12" Padding="10">
+                                                    <StackPanel Spacing="7" HorizontalAlignment="Center">
+                                                        <TextBlock Text="ANALÓGICO ESQUERDO" Foreground="#B9C2C9" FontSize="11" FontWeight="SemiBold"/>
+                                                        <Canvas Width="132" Height="132">
+                                                            <Ellipse Width="128" Height="128" Canvas.Left="2" Canvas.Top="2" Stroke="#3B4C61" StrokeThickness="2" Fill="#10171D"/>
+                                                            <Rectangle Width="1" Height="116" Canvas.Left="65.5" Canvas.Top="8" Fill="#303B45"/>
+                                                            <Rectangle Width="116" Height="1" Canvas.Left="8" Canvas.Top="65.5" Fill="#303B45"/>
+                                                            <Ellipse x:Name="DiagnosticLeftStickDot" Width="15" Height="15" Canvas.Left="58.5" Canvas.Top="58.5" Fill="#E62D4F" Stroke="#FF9BB1" StrokeThickness="1"/>
+                                                        </Canvas>
+                                                    </StackPanel>
+                                                </Border>
+                                                <Border Grid.Column="1" Background="{StaticResource DesignSurface}" BorderBrush="#303B45" BorderThickness="0" CornerRadius="12" Padding="10">
+                                                    <StackPanel Spacing="7" HorizontalAlignment="Center">
+                                                        <TextBlock Text="ANALÓGICO DIREITO" Foreground="#B9C2C9" FontSize="11" FontWeight="SemiBold"/>
+                                                        <Canvas Width="132" Height="132">
+                                                            <Ellipse Width="128" Height="128" Canvas.Left="2" Canvas.Top="2" Stroke="#3B4C61" StrokeThickness="2" Fill="#10171D"/>
+                                                            <Rectangle Width="1" Height="116" Canvas.Left="65.5" Canvas.Top="8" Fill="#303B45"/>
+                                                            <Rectangle Width="116" Height="1" Canvas.Left="8" Canvas.Top="65.5" Fill="#303B45"/>
+                                                            <Ellipse x:Name="DiagnosticRightStickDot" Width="15" Height="15" Canvas.Left="58.5" Canvas.Top="58.5" Fill="#746AF6" Stroke="#B6B0FF" StrokeThickness="1"/>
+                                                        </Canvas>
+                                                    </StackPanel>
+                                                </Border>
+                                                <Border Grid.Column="2" Background="{StaticResource DesignSurface}" BorderBrush="#303B45" BorderThickness="0" CornerRadius="12" Padding="12">
+                                                    <StackPanel Spacing="12" VerticalAlignment="Center">
+                                                        <StackPanel Spacing="5">
+                                                            <Grid>
+                                                                <TextBlock Text="L2 / LT" Foreground="#B9C2C9" FontSize="11"/>
+                                                                <TextBlock x:Name="DiagnosticLeftTriggerValueTextBlock" Text="0%" HorizontalAlignment="Right" Foreground="#E62D4F" FontSize="11"/>
+                                                            </Grid>
+                                                            <ProgressBar x:Name="DiagnosticLeftTriggerBar" Minimum="0" Maximum="100" Value="0" Height="9"/>
+                                                        </StackPanel>
+                                                        <StackPanel Spacing="5">
+                                                            <Grid>
+                                                                <TextBlock Text="R2 / RT" Foreground="#B9C2C9" FontSize="11"/>
+                                                                <TextBlock x:Name="DiagnosticRightTriggerValueTextBlock" Text="0%" HorizontalAlignment="Right" Foreground="#8B82FF" FontSize="11"/>
+                                                            </Grid>
+                                                            <ProgressBar x:Name="DiagnosticRightTriggerBar" Minimum="0" Maximum="100" Value="0" Height="9"/>
+                                                        </StackPanel>
+                                                        <TextBlock x:Name="DiagnosticLiveValuesTextBlock" Text="L 0,0 • R 0,0" Foreground="#748296" FontSize="11" TextWrapping="Wrap"/>
+                                                    </StackPanel>
+                                                </Border>
+                                            </Grid>
+                                            <StackPanel x:Name="DiagnosticResultPanel" Grid.Row="3" Visibility="Collapsed" Spacing="8">
+                                                <TextBlock x:Name="DiagnosticHealthTextBlock" Text="Saúde do controle: --" Foreground="#FFF4EF" FontSize="17" FontWeight="SemiBold"/>
+                                                <TextBlock x:Name="DiagnosticMeasurementsTextBlock" Text="" Foreground="#C9D1DC" FontSize="11" TextWrapping="Wrap"/>
+                                                <TextBlock x:Name="DiagnosticRecommendationTextBlock" Text="" Foreground="#F2A6B8" FontSize="11" FontWeight="SemiBold" TextWrapping="Wrap"/>
+                                                <TextBlock x:Name="DiagnosticWarningsTextBlock" Text="" Foreground="#FFB15A" FontSize="11" TextWrapping="Wrap" Visibility="Collapsed"/>
+                                                <Grid ColumnSpacing="8" Margin="0,4,0,0">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="1.25*"/>
+                                                        <ColumnDefinition Width="*"/>
+                                                        <ColumnDefinition Width="*"/>
+                                                    </Grid.ColumnDefinitions>
+                                                    <Button ui:InterfaceMotion.Enabled="True" x:Name="ApplyDiagnosticButton" Content="APLICAR AJUSTES MEDIDOS" Style="{StaticResource Primary}" Click="ApplyDiagnosticButton_Click" Padding="12,9"/>
+                                                    <Button ui:InterfaceMotion.Enabled="True" x:Name="RevertDiagnosticButton" Grid.Column="1" Content="REVERTER" Style="{StaticResource Ghost}" Click="RevertDiagnosticButton_Click" IsEnabled="False" Padding="12,9"/>
+                                                    <Button ui:InterfaceMotion.Enabled="True" x:Name="RetryDiagnosticButton" Grid.Column="2" Content="REFAZER" Style="{StaticResource Ghost}" Click="RetryDiagnosticButton_Click" Padding="12,9"/>
+                                                </Grid>
+                                            </StackPanel>
+                                            <Grid Grid.Row="4">
+                                                <Button ui:InterfaceMotion.Enabled="True" x:Name="CancelDiagnosticButton" Content="Cancelar / fechar diagnóstico" Style="{StaticResource Ghost}" HorizontalAlignment="Right" Click="CancelDiagnosticButton_Click" Padding="13,8"/>
+                                            </Grid>
+                                        </Grid>
+                                    </Border>
+                                </StackPanel>
+                            </Border>
+                            <Grid>
+<ui:CornerGlow AroundCard="True" Width="220" Height="140" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,-36,-28,0"/>
+<Border Style="{StaticResource DesignCard}" Padding="14">
+                                <StackPanel Spacing="7">
+                                    <TextBlock Text="SLOT STATUS" Foreground="#B9C2C9" FontSize="11" FontWeight="SemiBold" CharacterSpacing="55"/>
+                                    <Border Background="{StaticResource DesignSurface}" BorderBrush="#3A2230" BorderThickness="0" CornerRadius="12" Padding="12">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto"/>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                            </Grid.ColumnDefinitions>
+                                            <Ellipse Width="10" Height="10" Fill="#E62D4F" VerticalAlignment="Center"/>
+                                            <StackPanel Grid.Column="1" Margin="11,0,0,0">
+                                                <TextBlock x:Name="ActualSlotTextBlock" Text="Solicitado AUTO • Real --" Foreground="#FFF4EF" FontSize="11" FontWeight="SemiBold"/>
+                                                <TextBlock x:Name="ReservationTextBlock" Text="Sem reservas de slot" Foreground="#7E8A9B" FontSize="11" Margin="0,2,0,0"/>
+                                            </StackPanel>
+                                            <Border Grid.Column="2" Background="{StaticResource DesignSurface}" BorderBrush="#721B32" BorderThickness="0" CornerRadius="10" Padding="9,3" VerticalAlignment="Center">
+                                                <TextBlock Text="ATIVO" Foreground="#FF7393" FontSize="11" FontWeight="SemiBold"/>
+                                            </Border>
+                                        </Grid>
+                                    </Border>
+                                    <TextBlock x:Name="SlotConflictTextBlock" Text="" Foreground="#FFB15A" FontSize="11" TextWrapping="Wrap" Visibility="Collapsed"/>
+                                </StackPanel>
+                            </Border>
+</Grid>
+                            <Border Style="{StaticResource DesignCard}" Padding="14">
+                                <StackPanel Spacing="7">
+                                    <TextBlock Text="TROCA RÁPIDA • MORREU, PASSA O CONTROLE" Foreground="#B9C2C9" FontSize="11" FontWeight="SemiBold" CharacterSpacing="40"/>
+                                    <Grid ColumnSpacing="8">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="0.9*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <Button ui:InterfaceMotion.Enabled="True" x:Name="NextPlayerButton" tips:LevelingInfoToolTip.Text="No host, move o controle virtual para o próximo slot disponível de jogador. Útil quando você quer passar o controle rapidamente para outro jogador." Content="Próximo jogador  ›" Style="{StaticResource Ghost}" Click="NextPlayerButton_Click"/>
+                                        <Button ui:InterfaceMotion.Enabled="True" x:Name="PreviousPlayerButton" Grid.Column="1" tips:LevelingInfoToolTip.Text="No host, move o controle virtual para o slot anterior de jogador. Serve para voltar rapidamente para P1, P2, P3 ou P4." Content="‹  Jogador anterior" Style="{StaticResource Ghost}" Click="PreviousPlayerButton_Click"/>
+                                        <Button ui:InterfaceMotion.Enabled="True" x:Name="ClearSlotButton" Grid.Column="2" tips:LevelingInfoToolTip.Text="No host, libera o slot reservado do controle virtual atual e volta o roteamento para um estado limpo. Use quando um jogador travar ou sair." Content="Limpar slot" Style="{StaticResource Danger}" Click="ClearSlotButton_Click"/>
+                                    </Grid>
+                                    <TextBlock Text="A troca neutraliza o controle atual antes de recriar o ViGEm no novo slot. Limpar slot volta ao modo Automático e libera reservas." Style="{StaticResource Subtle}" TextWrapping="Wrap"/>
+                                </StackPanel>
+                            </Border>
+                            <Border Style="{StaticResource DesignCard}" Padding="14">
+                                <StackPanel Spacing="10">
+                                    <TextBlock Text="AJUSTE FINO" Foreground="#B9C2C9" FontSize="11" FontWeight="SemiBold" CharacterSpacing="55"/>
+                                    <Grid ColumnSpacing="14">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <StackPanel Spacing="4" tips:LevelingInfoToolTip.Text="Ignora pequenos movimentos perto do centro do analógico esquerdo. Aumentar ajuda contra drift, mas reduz a sensibilidade inicial.">
+                                            <Grid>
+                                                <TextBlock Text="Deadzone L" Style="{StaticResource FieldLabel}"/>
+                                                <TextBlock x:Name="LeftDeadzoneValue" Text="0%" Foreground="#E62D4F" HorizontalAlignment="Right" Width="42" TextAlignment="Right"/>
+                                            </Grid>
+                                            <Slider x:Name="LeftDeadzoneSlider" Minimum="0" Maximum="40" StepFrequency="1" ValueChanged="LeftDeadzoneSlider_ValueChanged"/>
+                                        </StackPanel>
+                                        <StackPanel Grid.Column="1" Spacing="4" tips:LevelingInfoToolTip.Text="Ignora pequenos movimentos perto do centro do analógico direito. Aumentar ajuda contra drift, mas reduz a sensibilidade inicial.">
+                                            <Grid>
+                                                <TextBlock Text="Deadzone R" Style="{StaticResource FieldLabel}"/>
+                                                <TextBlock x:Name="RightDeadzoneValue" Text="0%" Foreground="#8B82FF" HorizontalAlignment="Right" Width="42" TextAlignment="Right"/>
+                                            </Grid>
+                                            <Slider x:Name="RightDeadzoneSlider" Minimum="0" Maximum="40" StepFrequency="1" ValueChanged="RightDeadzoneSlider_ValueChanged"/>
+                                        </StackPanel>
+                                    </Grid>
+                                    <Grid ColumnSpacing="14">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <StackPanel Spacing="4" tips:LevelingInfoToolTip.Text="Faz o analógico esquerdo atingir 100% antes do limite físico. Valores maiores encurtam a distância necessária até a intensidade máxima.">
+                                            <Grid>
+                                                <TextBlock Text="Outer L" Style="{StaticResource FieldLabel}"/>
+                                                <TextBlock x:Name="LeftOuterDeadzoneValue" Text="0%" Foreground="#E62D4F" HorizontalAlignment="Right" Width="42" TextAlignment="Right"/>
+                                            </Grid>
+                                            <Slider x:Name="LeftOuterDeadzoneSlider" Minimum="0" Maximum="20" StepFrequency="1" ValueChanged="LeftOuterDeadzoneSlider_ValueChanged"/>
+                                        </StackPanel>
+                                        <StackPanel Grid.Column="1" Spacing="4" tips:LevelingInfoToolTip.Text="Faz o analógico direito atingir 100% antes do limite físico. Valores maiores encurtam a distância necessária até a intensidade máxima.">
+                                            <Grid>
+                                                <TextBlock Text="Outer R" Style="{StaticResource FieldLabel}"/>
+                                                <TextBlock x:Name="RightOuterDeadzoneValue" Text="0%" Foreground="#8B82FF" HorizontalAlignment="Right" Width="42" TextAlignment="Right"/>
+                                            </Grid>
+                                            <Slider x:Name="RightOuterDeadzoneSlider" Minimum="0" Maximum="20" StepFrequency="1" ValueChanged="RightOuterDeadzoneSlider_ValueChanged"/>
+                                        </StackPanel>
+                                    </Grid>
+                                    <Grid ColumnSpacing="14">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <StackPanel Spacing="4" tips:LevelingInfoToolTip.Text="Adiciona uma resposta mínima ao sair do centro do analógico esquerdo. Pode deixar movimentos iniciais mais rápidos, mas reduz a precisão fina.">
+                                            <Grid>
+                                                <TextBlock Text="Anti-deadzone L" Style="{StaticResource FieldLabel}"/>
+                                                <TextBlock x:Name="LeftAntiDeadzoneValue" Text="0%" Foreground="#E62D4F" HorizontalAlignment="Right" Width="42" TextAlignment="Right"/>
+                                            </Grid>
+                                            <Slider x:Name="LeftAntiDeadzoneSlider" Minimum="0" Maximum="30" StepFrequency="1" ValueChanged="LeftAntiDeadzoneSlider_ValueChanged"/>
+                                        </StackPanel>
+                                        <StackPanel Grid.Column="1" Spacing="4" tips:LevelingInfoToolTip.Text="Adiciona uma resposta mínima ao sair do centro do analógico direito. Pode deixar movimentos iniciais mais rápidos, mas reduz a precisão fina.">
+                                            <Grid>
+                                                <TextBlock Text="Anti-deadzone R" Style="{StaticResource FieldLabel}"/>
+                                                <TextBlock x:Name="RightAntiDeadzoneValue" Text="0%" Foreground="#8B82FF" HorizontalAlignment="Right" Width="42" TextAlignment="Right"/>
+                                            </Grid>
+                                            <Slider x:Name="RightAntiDeadzoneSlider" Minimum="0" Maximum="30" StepFrequency="1" ValueChanged="RightAntiDeadzoneSlider_ValueChanged"/>
+                                        </StackPanel>
+                                    </Grid>
+                                    <Grid ColumnSpacing="14">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <StackPanel Spacing="4" tips:LevelingInfoToolTip.Text="Ignora pequenas leituras iniciais do gatilho esquerdo. Útil quando o gatilho registra pressão sem estar realmente apertado.">
+                                            <Grid>
+                                                <TextBlock Text="Deadzone LT" Style="{StaticResource FieldLabel}"/>
+                                                <TextBlock x:Name="LeftTriggerDeadzoneValue" Text="0%" Foreground="#E62D4F" HorizontalAlignment="Right" Width="42" TextAlignment="Right"/>
+                                            </Grid>
+                                            <Slider x:Name="LeftTriggerDeadzoneSlider" Minimum="0" Maximum="40" StepFrequency="1" ValueChanged="LeftTriggerDeadzoneSlider_ValueChanged"/>
+                                        </StackPanel>
+                                        <StackPanel Grid.Column="1" Spacing="4" tips:LevelingInfoToolTip.Text="Ignora pequenas leituras iniciais do gatilho direito. Útil quando o gatilho registra pressão sem estar realmente apertado.">
+                                            <Grid>
+                                                <TextBlock Text="Deadzone RT" Style="{StaticResource FieldLabel}"/>
+                                                <TextBlock x:Name="RightTriggerDeadzoneValue" Text="0%" Foreground="#8B82FF" HorizontalAlignment="Right" Width="42" TextAlignment="Right"/>
+                                            </Grid>
+                                            <Slider x:Name="RightTriggerDeadzoneSlider" Minimum="0" Maximum="40" StepFrequency="1" ValueChanged="RightTriggerDeadzoneSlider_ValueChanged"/>
+                                        </StackPanel>
+                                    </Grid>
+                                    <Grid ColumnSpacing="12">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="1.1*"/>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <StackPanel Spacing="4" tips:LevelingInfoToolTip.Text="Muda como o movimento físico dos analógicos vira resposta no jogo. Linear mantém 1:1; Precisão suaviza o centro; Rápida responde mais cedo.">
+                                            <TextBlock Text="Curva dos analógicos" Style="{StaticResource FieldLabel}"/>
+                                            <ComboBox x:Name="ResponseCurveComboBox" SelectedIndex="0" SelectionChanged="ResponseCurveComboBox_SelectionChanged">
+                                                <ComboBoxItem Content="Linear • 1:1"/>
+                                                <ComboBoxItem Content="Precisão • centro suave"/>
+                                                <ComboBoxItem Content="Rápida • resposta cedo"/>
+                                            </ComboBox>
+                                        </StackPanel>
+                                        <ToggleSwitch x:Name="InvertLeftYToggle" tips:LevelingInfoToolTip.Text="Inverte o eixo vertical do analógico esquerdo: empurrar para cima passa a gerar o valor que normalmente seria para baixo, e vice-versa." Grid.Column="1" Header="Inverter Y esquerdo" Toggled="InvertLeftYToggle_Toggled" VerticalAlignment="Bottom"/>
+                                        <ToggleSwitch x:Name="InvertRightYToggle" tips:LevelingInfoToolTip.Text="Inverte o eixo vertical do analógico direito: empurrar para cima passa a gerar o valor que normalmente seria para baixo, e vice-versa." Grid.Column="2" Header="Inverter Y direito" Toggled="InvertRightYToggle_Toggled" VerticalAlignment="Bottom"/>
+                                    </Grid>
+                                </StackPanel>
+                            </Border>
+                            <Grid ColumnSpacing="8">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="1.25*"/>
+                                </Grid.ColumnDefinitions>
+                                <Button ui:InterfaceMotion.Enabled="True" x:Name="RebindButton" tips:LevelingInfoToolTip.Text="No host, recria o controle virtual Xbox 360. Use quando o jogo não reconheceu o dispositivo corretamente ou quando você precisa reinicializar o ViGEm." Content="↻  Recriar controle virtual" Style="{StaticResource Ghost}" Click="RebindButton_Click"/>
+                                <Button ui:InterfaceMotion.Enabled="True" x:Name="NeutralizeButton" Grid.Column="1" tips:LevelingInfoToolTip.Text="No host, envia imediatamente um estado neutro para o controle virtual. Isso solta botões e analógicos caso algo tenha ficado preso." Content="◎  Neutralizar agora" Style="{StaticResource Ghost}" Click="NeutralizeButton_Click"/>
+                                <Button ui:InterfaceMotion.Enabled="True" x:Name="ResetTuningButton" Grid.Column="2" tips:LevelingInfoToolTip.Text="Restaura o perfil original do controle para a skin atual, incluindo remapeamentos, deadzones, curvas e inversões salvos nesta aba." Content="↶  Restaurar perfil original do controle" Style="{StaticResource Primary}" Click="ResetTuningButton_Click"/>
+                            </Grid>
+                            <TextBlock Text="As alterações são salvas automaticamente. Transporte: latest-wins 250 Hz • UI: 20 Hz • watchdog: 250 ms." Foreground="#8F9CA8" FontSize="11" TextWrapping="Wrap"/>
+                            <!-- Hidden compatibility controls: mapping is now contextual, opened from the controller itself. -->
+                            <StackPanel Visibility="Collapsed">
+                                <TextBlock x:Name="SelectedControlNameTextBlock"/>
+                                <TextBlock x:Name="SelectedControlHintTextBlock"/>
+                                <ComboBox x:Name="MappingTargetComboBox" SelectionChanged="MappingTargetComboBox_SelectionChanged"/>
+                                <Button ui:InterfaceMotion.Enabled="True" x:Name="ResetSelectedMappingButton" Click="ResetSelectedMappingButton_Click"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+                </Grid>
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</Page>

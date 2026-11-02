@@ -1,0 +1,136 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows10.0.26100.0</TargetFramework>
+    <TargetPlatformMinVersion>10.0.17763.0</TargetPlatformMinVersion>
+    <RootNamespace>Multiverse</RootNamespace>
+    <AssemblyName>Leveling</AssemblyName>
+    <Version>11.75.1-rc.1</Version>
+    <InformationalVersion>CORE 11.75.1 RC1 Updates</InformationalVersion>
+    <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
+    <ApplicationIcon>Assets\Leveling.ico</ApplicationIcon>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <Platforms>x64</Platforms>
+    <RuntimeIdentifiers>win-x64</RuntimeIdentifiers>
+    <PublishProfile>win-x64.pubxml</PublishProfile>
+
+    <UseWinUI>true</UseWinUI>
+    <DefineConstants>$(DefineConstants);DISABLE_XAML_GENERATED_MAIN</DefineConstants>
+    <StartupObject>Multiverse.Program</StartupObject>
+    <WinUISDKReferences>false</WinUISDKReferences>
+    <EnableMsixTooling>true</EnableMsixTooling>
+    <Nullable>enable</Nullable>
+
+    <!-- Core 08: publicação estável.
+         Não usar trimming enquanto o protocolo usa System.Text.Json
+         em caminhos que dependem de análise dinâmica/reflection. -->
+    <PublishTrimmed>false</PublishTrimmed>
+    <PublishSingleFile>false</PublishSingleFile>
+    <SelfContained>true</SelfContained>
+    <!-- Use the same unpackaged, self-contained deployment in F5 and Release. -->
+    <WindowsPackageType>None</WindowsPackageType>
+    <WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>
+    <PlatformTarget Condition="'$(Platform)' == 'x64'">x64</PlatformTarget>
+  </PropertyGroup>
+
+  <!-- Read-only network diagnostics, available in the published folder. -->
+  <ItemGroup>
+    <None Update="DIAGNOSTICAR_REDE.cmd;DIAGNOSTICAR_REDE.ps1;TESTAR_VIDEO_LOCAL.cmd;TESTAR_ESTABILIDADE_LOCAL.cmd">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Assets\Studio\*-crimson.png"><CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory><CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory></Content>
+    <Content Include="Assets\Brand\*.png;Assets\Brand\*.svg;Assets\Brand\*.json"><CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory><CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory></Content>
+  </ItemGroup>
+  <!-- Regression programs are standalone projects, not application sources. -->
+  <ItemGroup>
+    <Compile Remove="tests\**\*.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Assets\SplashScreen.scale-200.png" />
+    <Content Include="Assets\LockScreenLogo.scale-200.png" />
+    <Content Include="Assets\Square150x150Logo.scale-200.png" />
+    <Content Include="Assets\Square44x44Logo.scale-200.png" />
+    <Content Include="Assets\Square44x44Logo.targetsize-24_altform-unplated.png" />
+    <Content Include="Assets\StoreLogo.png" />
+    <Content Include="Assets\Wide310x150Logo.scale-200.png" />
+    <Content Include="Assets\ControllerBase.svg" />
+    <Content Include="Assets\ControllerBase.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="Assets\ControllerPs5.svg" />
+    <Content Include="Assets\ControllerPs5.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="Assets\ControllerShell.svg" />
+    <Content Include="Assets\LevelingLogo.png"><CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory><CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory></Content>
+    <Content Include="Assets\LevelingAppIcon.png" />
+    <Content Include="Assets\LevelingWordmark.png" />
+    <Content Include="Assets\LevelingAppIconSource.png" />
+    <Content Include="Assets\LevelingBackgroundWatermark.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Manifest Include="$(ApplicationManifest)" />
+  </ItemGroup>
+
+  <!--
+    Defining the "Msix" ProjectCapability here allows the Single-project MSIX Packaging
+    Tools extension to be activated for this project even if the Windows App SDK Nuget
+    package has not yet been restored.
+  -->
+  <ItemGroup Condition="'$(DisableMsixProjectCapabilityAddedByProject)'!='true' and '$(EnableMsixTooling)'=='true'">
+    <ProjectCapability Include="Msix" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Velopack" Version="1.2.0" />
+    <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.28000.2526" />
+    <PackageReference Include="Microsoft.WindowsAppSDK" Version="2.4.0" />
+  </ItemGroup>
+
+  <!--
+    Defining the "HasPackageAndPublishMenuAddedByProject" property here allows the Solution
+    Explorer "Package and Publish" context menu entry to be enabled for this project even if
+    the Windows App SDK Nuget package has not yet been restored.
+  -->
+  <PropertyGroup Condition="'$(DisableHasPackageAndPublishMenuAddedByProject)'!='true' and '$(EnableMsixTooling)'=='true'">
+    <HasPackageAndPublishMenu>true</HasPackageAndPublishMenu>
+  </PropertyGroup>
+
+  <!-- Publish Properties -->
+  <PropertyGroup>
+    <PublishReadyToRun Condition="'$(Configuration)' == 'Debug'">False</PublishReadyToRun>
+    <PublishReadyToRun Condition="'$(Configuration)' != 'Debug'">True</PublishReadyToRun>
+
+    <!-- Mantido FALSE em Debug e Release para eliminar os IL2026 do Core 08
+         e evitar remover código necessário em runtime. -->
+    <PublishTrimmed>false</PublishTrimmed>
+    <GenerateAppInstallerFile>False</GenerateAppInstallerFile>
+    <AppxPackageSigningEnabled>False</AppxPackageSigningEnabled>
+    <AppxPackageSigningTimestampDigestAlgorithm>SHA256</AppxPackageSigningTimestampDigestAlgorithm>
+    <AppxAutoIncrementPackageRevision>True</AppxAutoIncrementPackageRevision>
+    <AppxSymbolPackageEnabled>False</AppxSymbolPackageEnabled>
+    <GenerateTestArtifacts>False</GenerateTestArtifacts>
+    <AppxBundle>Never</AppxBundle>
+    <HoursBetweenUpdateChecks>0</HoursBetweenUpdateChecks>
+    <PackageCertificateThumbprint>2BB22D880873FAE6FF15A3B1ACE6C036777CD4BC</PackageCertificateThumbprint>
+  </PropertyGroup>
+
+  <!-- CORE 11.74c4b: a successful publish must contain the approved controller images. -->
+  <Target Name="VerifyPublishedControllerImages" AfterTargets="Publish"
+          Condition="'$(IsPublishable)' != 'false' and '$(DesignTimeBuild)' != 'true'">
+    <Error Condition="!Exists('$(PublishDir)Assets\ControllerBase.png')"
+           Text="ControllerBase.png nao foi publicado. Confira os recursos do Controle. Release nao aprovada." />
+    <Error Condition="!Exists('$(PublishDir)Assets\ControllerPs5.png')"
+           Text="ControllerPs5.png nao foi publicado. Confira os recursos do Controle. Release nao aprovada." />
+  </Target>
+<Target Name="VerifyPublishedLogo" AfterTargets="Publish" Condition="'$(IsPublishable)' != 'false' and '$(DesignTimeBuild)' != 'true'">
+    <Error Condition="!Exists('$(PublishDir)Assets\LevelingLogo.png')" Text="A logo original do Leveling nao foi publicada." />
+  </Target>
+</Project>

@@ -1,0 +1,119 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<Page xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" x:Class="Multiverse.Views.DiagnosticsPage" Background="{StaticResource DesignBackground}" UseLayoutRounding="True">
+    <Page.Resources>
+        <Style x:Key="Card" TargetType="Border">
+            <Setter Property="Background" Value="{StaticResource DesignSurface}"/>
+            <Setter Property="BorderBrush" Value="{StaticResource DesignGlassEdge}"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="CornerRadius" Value="10"/>
+            <Setter Property="Padding" Value="18"/>
+        </Style>
+    </Page.Resources>
+    <Grid Background="{StaticResource DesignBackground}">
+        <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
+            <StackPanel Margin="24,4,24,24" HorizontalAlignment="Stretch" Spacing="16">
+                <StackPanel Margin="0,0,0,6">
+                    <TextBlock Text="DIAGNÓSTICO" Foreground="#FFF4EF" FontSize="24" FontWeight="Bold" CharacterSpacing="0"/>
+                    <TextBlock Text="Telemetria somente de leitura. O nível configurado controla quanto o Leveling coleta e exibe aqui." Foreground="#8F9CA8" FontSize="12" TextWrapping="Wrap" Margin="0,6,0,0"/>
+                </StackPanel>
+                <Border Style="{StaticResource Card}">
+                    <StackPanel Spacing="7">
+                        <TextBlock Text="INICIALIZAÇÃO / ERROS" Foreground="#E62D4F" FontSize="10" FontWeight="SemiBold"/>
+                        <TextBlock x:Name="StartupStatusText" Foreground="#B9C2C9" FontSize="10" TextWrapping="Wrap"/>
+                        <Button x:Name="OpenStartupLogButton" Content="Abrir pasta dos registros de inicialização" Click="OpenStartupLog_Click" HorizontalAlignment="Left" Padding="14,8"/>
+                        <TextBlock Text="Os registros são locais e podem conter detalhes técnicos de exceções. Revise antes de compartilhar." Foreground="#7E8A9B" FontSize="9" TextWrapping="Wrap"/>
+                    </StackPanel>
+                </Border>
+                <Border Style="{StaticResource Card}" BorderBrush="#303B45">
+                    <StackPanel Spacing="7">
+                        <TextBlock Text="PIPELINE REAL • TAXAS E IDADE" Foreground="#E62D4F" FontSize="10" FontWeight="SemiBold"/>
+                        <TextBlock x:Name="PipelineHealthText" Foreground="#B9C2C9" FontSize="10" FontFamily="Consolas" TextWrapping="Wrap"/>
+                    </StackPanel>
+                </Border>
+                <Grid x:Name="BasicDiagnosticsGrid" ColumnSpacing="14">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Border Style="{StaticResource Card}">
+                        <StackPanel Spacing="7">
+                            <TextBlock Text="SESSÃO / REDE" Foreground="#E62D4F" FontSize="10" FontWeight="SemiBold"/>
+                            <TextBlock x:Name="SessionDiagText" Foreground="#B9C2C9" FontSize="10" TextWrapping="Wrap"/>
+                        </StackPanel>
+                    </Border>
+                    <Border Grid.Column="1" Style="{StaticResource Card}">
+                        <StackPanel Spacing="7">
+                            <TextBlock Text="TRANSPORTE" Foreground="#F06A86" FontSize="10" FontWeight="SemiBold"/>
+                            <TextBlock x:Name="TransportDiagText" Foreground="#B9C2C9" FontSize="10" TextWrapping="Wrap"/>
+                        </StackPanel>
+                    </Border>
+                </Grid>
+                <Border Style="{StaticResource Card}" BorderBrush="#303B45">
+                    <StackPanel Spacing="7">
+                        <TextBlock Text="MICROTRAVADAS / RECUPERAÇÃO" Foreground="#E62D4F" FontSize="10" FontWeight="SemiBold"/>
+                        <TextBlock x:Name="MicrobreakDiagText" Foreground="#B9C2C9" FontSize="10" TextWrapping="Wrap"/>
+                        <TextBlock Text="Os contadores são somente leitura e cumulativos na sessão. Se houver uma quebrada rápida, veja quais números aumentaram." Foreground="#7E8A9B" FontSize="9" TextWrapping="Wrap"/>
+                    </StackPanel>
+                </Border>
+                <Border Style="{StaticResource Card}">
+                    <StackPanel Spacing="7">
+                        <TextBlock Text="PROCESSO LEVELING" Foreground="#E62D4F" FontSize="10" FontWeight="SemiBold"/>
+                        <TextBlock x:Name="ProcessResourceDiagText" Foreground="#B9C2C9" FontSize="10" TextWrapping="Wrap"/>
+                        <TextBlock Text="Só é atualizado enquanto esta página de diagnóstico está aberta." Foreground="#7E8A9B" FontSize="9" TextWrapping="Wrap"/>
+                    </StackPanel>
+                </Border>
+                <Grid x:Name="AdvancedDiagnosticsGrid" ColumnSpacing="14">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Border Style="{StaticResource Card}">
+                        <StackPanel Spacing="7">
+                            <TextBlock Text="WGC / COPY / RING" Foreground="#E62D4F" FontSize="10" FontWeight="SemiBold"/>
+                            <TextBlock x:Name="CaptureDiagText" Foreground="#B9C2C9" FontSize="10" TextWrapping="Wrap"/>
+                        </StackPanel>
+                    </Border>
+                    <Border Grid.Column="1" Style="{StaticResource Card}">
+                        <StackPanel Spacing="7">
+                            <TextBlock Text="NVENC" Foreground="#F06A86" FontSize="10" FontWeight="SemiBold"/>
+                            <TextBlock x:Name="EncoderDiagText" Foreground="#B9C2C9" FontSize="10" TextWrapping="Wrap"/>
+                        </StackPanel>
+                    </Border>
+                </Grid>
+                <Grid x:Name="PeripheralDiagnosticsGrid" ColumnSpacing="14">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Border Style="{StaticResource Card}">
+                        <StackPanel Spacing="7">
+                            <TextBlock Text="Áudio" Foreground="#E62D4F" FontSize="10" FontWeight="SemiBold"/>
+                            <TextBlock x:Name="AudioDiagText" Foreground="#B9C2C9" FontSize="10" TextWrapping="Wrap"/>
+                        </StackPanel>
+                    </Border>
+                    <Border Grid.Column="1" Style="{StaticResource Card}">
+                        <StackPanel Spacing="7">
+                            <TextBlock Text="CONTROLE" Foreground="#F06A86" FontSize="10" FontWeight="SemiBold"/>
+                            <TextBlock x:Name="GamepadDiagText" Foreground="#B9C2C9" FontSize="10" TextWrapping="Wrap"/>
+                        </StackPanel>
+                    </Border>
+                </Grid>
+                <Border Style="{StaticResource Card}" BorderBrush="#303B45">
+                    <StackPanel Spacing="9">
+                        <TextBlock Text="REGISTRO AUTOMÁTICO DE INCIDENTES" Foreground="#E62D4F" FontSize="10" FontWeight="SemiBold"/>
+                        <TextBlock Text="O Leveling registra travadinhas e congelamentos automaticamente, mesmo com esta página fechada. Não grava imagem, áudio, teclas ou códigos de conexão." Foreground="#B9C2C9" FontSize="11" TextWrapping="Wrap"/>
+                        <TextBlock x:Name="RecorderStatusText" Foreground="#8F9CA8" FontSize="10" TextWrapping="Wrap"/>
+                        <Button x:Name="ExportDiagnosticsButton" Content="Exportar diagnóstico (.zip)" Click="ExportDiagnostics_Click" HorizontalAlignment="Left" Padding="18,10"/>
+                        <TextBlock x:Name="ExportStatusText" Foreground="#B9C2C9" FontSize="10" TextWrapping="Wrap"/>
+                    </StackPanel>
+                </Border>
+                <Border Style="{StaticResource Card}" Background="#1C252D">
+                    <StackPanel Spacing="4">
+                        <TextBlock x:Name="DiagnosticsModeText" Text="Nível: básico" Foreground="#E62D4F" FontSize="10" FontWeight="SemiBold"/>
+                        <TextBlock Text="Atualização visual: 2 Hz quando ativa. O diagnóstico não altera bitrate, FPS, prioridade GPU, WGC, NVENC ou filas do stream." Foreground="#7E8A9B" FontSize="9" TextWrapping="Wrap"/>
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</Page>

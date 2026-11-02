@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="4096" height="6144" viewBox="0 0 320 480">
+<title>Mouse - lineart vetorial</title>
+<g fill="none" stroke="#111823" stroke-width="1.45" stroke-linecap="round" stroke-linejoin="round">
+<!-- Continuous body outline, balanced around the center axis. -->
+<path id="corpo" d="M160 23 C132 23 101 28 77 39 C59 48 49 65 48 87 C47 126 48 163 49 199 C50 226 51 251 48 277 C46 299 39 315 40 336 C42 375 60 415 86 436 C105 452 129 460 160 460 C191 460 215 452 234 436 C260 415 278 375 280 336 C281 315 274 299 272 277 C269 251 270 226 271 199 C272 163 273 126 272 87 C271 65 261 48 243 39 C219 28 188 23 160 23 Z"/>
+<path id="divisao-botoes" d="M49 177 L137 256 C141 260 145 261 151 261 L169 261 C175 261 179 260 183 256 L271 177"/>
+<path id="linha-central-superior" d="M160 34 V68"/>
+<path id="linha-central-intermediaria" d="M160 142 V173"/>
+<path id="linha-central-inferior" d="M160 235 V261"/>
+<!-- Recess and wheel retain their own separate editable contours. -->
+<rect id="encaixe-roda" x="145" y="68" width="30" height="74" rx="11"/>
+<rect id="roda" x="149" y="73" width="22" height="65" rx="8"/>
+<g id="textura-roda" stroke-width=".8">
+<path d="M152 85 Q160 82 168 85 M152 90 Q160 87 168 90 M152 95 Q160 92 168 95 M152 100 Q160 97 168 100 M152 105 Q160 102 168 105 M152 110 Q160 107 168 110 M152 115 Q160 112 168 115 M152 120 Q160 117 168 120 M152 125 Q160 122 168 125 M153 130 Q160 127 167 130"/>
+</g>
+<rect id="botao-central" x="154" y="173" width="12" height="62" rx="6"/>
+<path id="separacao-botao-central" d="M154 203 H166"/>
+<!-- Side switches appear only on the left in the reference. -->
+<path id="botao-lateral-superior" d="M48 190 C44 193 44 202 45 213 L47 241 L49.5 239"/>
+<path id="botao-lateral-inferior" d="M48 246 L43 247 C43 268 43 291 43 302 C47 288 49 267 48 246 Z"/>
+</g>
+</svg>

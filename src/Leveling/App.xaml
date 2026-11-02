@@ -1,0 +1,163 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<Application xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:local="using:Multiverse" xmlns:ui="using:Multiverse.Services" x:Class="Multiverse.App">
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <XamlControlsResources xmlns="using:Microsoft.UI.Xaml.Controls"/>
+                <!-- Other merged dictionaries here -->
+            </ResourceDictionary.MergedDictionaries>
+            <SolidColorBrush x:Key="DesignBackground" Color="Transparent"/>
+            <!-- Translucent layers over the single window-level desktop acrylic. -->
+            <SolidColorBrush x:Key="DesignSurface" Color="#CC191D24"/>
+            <SolidColorBrush x:Key="DesignField" Color="#CC222730"/>
+            <AcrylicBrush x:Key="DesignPopup" TintColor="#202B34" TintOpacity="0.94" TintLuminosityOpacity="0.96" FallbackColor="#202B34"/>
+            <SolidColorBrush x:Key="DesignGlassEdge" Color="#18FFFFFF"/>
+            <SolidColorBrush x:Key="DesignAccentEdge" Color="#18FFFFFF"/>
+            <SolidColorBrush x:Key="DesignPrimary" Color="#E62D4F"/>
+            <SolidColorBrush x:Key="DesignSelected" Color="#253C2029"/>
+            <SolidColorBrush x:Key="DesignAccent" Color="#E62D4F"/>
+            <SolidColorBrush x:Key="DesignMuted" Color="#B0BBC5"/>
+            <SolidColorBrush x:Key="TextControlBackgroundPointerOver" Color="#E02D333E"/>
+            <SolidColorBrush x:Key="TextControlBackgroundFocused" Color="#F0222730"/>
+            <SolidColorBrush x:Key="TextControlForegroundFocused" Color="#F2F4F7"/>
+            <SolidColorBrush x:Key="TextControlPlaceholderForegroundPointerOver" Color="#D3DAE3"/>
+            <SolidColorBrush x:Key="TextControlPlaceholderForegroundFocused" Color="#B9C3CE"/>
+            <SolidColorBrush x:Key="ComboBoxBackgroundPointerOver" Color="#E02D333E"/>
+            <SolidColorBrush x:Key="ComboBoxBackgroundPressed" Color="#E0252A33"/>
+            <Style x:Key="DesignCard" TargetType="Border">
+                <Setter Property="Background" Value="{StaticResource DesignSurface}"/>
+                <Setter Property="BorderBrush" Value="{StaticResource DesignGlassEdge}"/>
+                <Setter Property="BorderThickness" Value="0"/>
+                <Setter Property="CornerRadius" Value="12"/>
+                <Setter Property="Padding" Value="16"/>
+            </Style>
+            <Style x:Key="DesignIconTile" TargetType="Border">
+                <Setter Property="Width" Value="44"/>
+                <Setter Property="Height" Value="44"/>
+                <Setter Property="Background" Value="{StaticResource DesignSelected}"/>
+                <Setter Property="BorderBrush" Value="#721B32"/>
+                <Setter Property="BorderThickness" Value="0"/>
+                <Setter Property="CornerRadius" Value="10"/>
+            </Style>
+            <Style x:Key="DesignTitle" TargetType="TextBlock">
+                <Setter Property="FontSize" Value="28"/>
+                <Setter Property="FontWeight" Value="Bold"/>
+                <Setter Property="Foreground" Value="#FFF4EF"/>
+            </Style>
+            <Style x:Key="DesignSubtitle" TargetType="TextBlock">
+                <Setter Property="FontSize" Value="15"/>
+                <Setter Property="Foreground" Value="{StaticResource DesignMuted}"/>
+                <Setter Property="TextWrapping" Value="Wrap"/>
+            </Style>
+            <Style x:Key="DesignSectionTitle" TargetType="TextBlock">
+                <Setter Property="FontSize" Value="16"/>
+                <Setter Property="FontWeight" Value="SemiBold"/>
+                <Setter Property="Foreground" Value="#FFF4EF"/>
+                <Setter Property="TextWrapping" Value="Wrap"/>
+            </Style>
+            <Style x:Key="DesignKicker" TargetType="TextBlock">
+                <Setter Property="FontSize" Value="12"/>
+                <Setter Property="FontWeight" Value="SemiBold"/>
+                <Setter Property="Foreground" Value="{StaticResource DesignAccent}"/>
+            </Style>
+            <Style TargetType="Button">
+                <Setter Property="VerticalContentAlignment" Value="Center"/>
+                <Setter Property="FontSize" Value="14"/>
+                <Setter Property="ui:InterfaceMotion.Enabled" Value="True"/>
+                <Setter Property="Padding" Value="14,9"/>
+                <Setter Property="CornerRadius" Value="10"/>
+                <Setter Property="Background" Value="{StaticResource DesignField}"/>
+                <Setter Property="BorderBrush" Value="Transparent"/>
+                <Setter Property="Foreground" Value="#FFF4EF"/>
+            
+                <Setter Property="BorderThickness" Value="0"/>
+            </Style>
+            <Style x:Key="DesignAction" TargetType="Button" BasedOn="{StaticResource DefaultButtonStyle}">
+                <Setter Property="ui:InterfaceMotion.Enabled" Value="True"/>
+                <Setter Property="Background" Value="{StaticResource DesignPrimary}"/>
+                <Setter Property="BorderBrush" Value="#E62D4F"/>
+                <Setter Property="Foreground" Value="White"/>
+                <Setter Property="FontWeight" Value="SemiBold"/>
+                <Setter Property="CornerRadius" Value="10"/>
+                <Setter Property="Padding" Value="18,10"/>
+            
+<Setter Property="BorderThickness" Value="0"/>
+</Style>
+            <Style TargetType="ComboBox">
+                <Setter Property="ui:InterfaceMotion.Enabled" Value="True"/>
+                <Setter Property="VerticalContentAlignment" Value="Center"/>
+                <Setter Property="FontSize" Value="14"/>
+                <Setter Property="Padding" Value="12,8"/>
+                <Setter Property="HorizontalAlignment" Value="Stretch"/>
+                <Setter Property="MinHeight" Value="40"/>
+                <Setter Property="CornerRadius" Value="10"/>
+                <Setter Property="Background" Value="{StaticResource DesignField}"/>
+                <Setter Property="BorderBrush" Value="Transparent"/>
+            
+<Setter Property="BorderThickness" Value="0"/>
+
+                <Setter Property="Foreground" Value="#F2F4F7"/>
+</Style>
+            <Style TargetType="TextBox">
+                <Setter Property="ui:InterfaceMotion.Enabled" Value="True"/>
+                <Setter Property="VerticalContentAlignment" Value="Center"/>
+                <Setter Property="FontSize" Value="14"/>
+                <Setter Property="Padding" Value="12,8"/>
+                <Setter Property="MinHeight" Value="40"/>
+                <Setter Property="CornerRadius" Value="10"/>
+                <Setter Property="Background" Value="{StaticResource DesignField}"/>
+                <Setter Property="BorderBrush" Value="Transparent"/>
+            
+<Setter Property="BorderThickness" Value="0"/>
+
+                <Setter Property="Foreground" Value="#F2F4F7"/>
+<Setter Property="PlaceholderForeground" Value="#B9C3CE"/>
+</Style>
+            <ImageBrush x:Key="StudioFriendsArt" ImageSource="ms-appx:///Assets/Brand/background-dark.png" Stretch="UniformToFill"/>
+            <ImageBrush x:Key="StudioTransmissionArt" ImageSource="ms-appx:///Assets/Studio/studio-crimson.png" Stretch="UniformToFill"/>
+            <SolidColorBrush x:Key="StudioOutline" Color="#303B45"/>
+            <ImageBrush x:Key="StudioStudioArt" ImageSource="ms-appx:///Assets/Studio/studio-crimson.png" Stretch="UniformToFill" AlignmentY="Center"/>
+            <ImageBrush x:Key="StudioAudioArt" ImageSource="ms-appx:///Assets/Studio/audio-crimson.png" Stretch="UniformToFill" AlignmentY="Center"/>
+            <ImageBrush x:Key="StudioControllerArt" ImageSource="ms-appx:///Assets/Studio/controller-crimson.png" Stretch="UniformToFill" AlignmentY="Center"/>
+            <LinearGradientBrush x:Key="StudioScrim" StartPoint="0,0" EndPoint="1,0">
+                <GradientStop Color="#EF10171D" Offset="0"/>
+                <GradientStop Color="#A010171D" Offset=".42"/>
+                <GradientStop Color="#0010171D" Offset=".8"/>
+            </LinearGradientBrush>
+            <SolidColorBrush x:Key="ButtonBackgroundPointerOver" Color="#60313A43"/>
+            <SolidColorBrush x:Key="ButtonBackgroundPressed" Color="#60232A33"/>
+            <SolidColorBrush x:Key="ButtonBorderBrushPointerOver" Color="Transparent"/>
+            <SolidColorBrush x:Key="ButtonBorderBrushPressed" Color="Transparent"/>
+            <Color x:Key="SystemAccentColor">#E62D4F</Color>
+            <Color x:Key="SystemAccentColorLight1">#EF7389</Color>
+            <Color x:Key="SystemAccentColorLight2">#E62D4F</Color>
+            <Color x:Key="SystemAccentColorLight3">#FBE0DF</Color>
+            <SolidColorBrush x:Key="SystemControlHighlightAccentBrush" Color="#E62D4F"/>
+            <Style TargetType="FlyoutPresenter">
+                <Setter Property="ui:InterfaceMotion.Enabled" Value="True"/>
+                <Setter Property="Background" Value="{StaticResource DesignPopup}"/>
+                <Setter Property="BorderBrush" Value="{StaticResource DesignGlassEdge}"/>
+                <Setter Property="CornerRadius" Value="12"/>
+            </Style>
+            <Style TargetType="MenuFlyoutPresenter">
+                <Setter Property="ui:InterfaceMotion.Enabled" Value="True"/>
+                <Setter Property="Background" Value="{StaticResource DesignPopup}"/>
+                <Setter Property="BorderBrush" Value="{StaticResource DesignGlassEdge}"/>
+                <Setter Property="CornerRadius" Value="12"/>
+            </Style>
+            <AcrylicBrush x:Key="ComboBoxDropDownBackground" TintColor="#202B34" TintOpacity="0.94" TintLuminosityOpacity="0.96" FallbackColor="#202B34"/>
+            <Style x:Key="StudioTab" TargetType="Button">
+                <Setter Property="Background" Value="Transparent"/>
+                <Setter Property="BorderBrush" Value="Transparent"/>
+                <Setter Property="FontSize" Value="11"/>
+                <Setter Property="FontWeight" Value="SemiBold"/>
+                <Setter Property="Padding" Value="14,7"/>
+                <Setter Property="CornerRadius" Value="18"/>
+                <Setter Property="ui:InterfaceMotion.Enabled" Value="True"/>
+            </Style>
+        <Style TargetType="ToggleSwitch"><Setter Property="ui:InterfaceMotion.Enabled" Value="True"/></Style>
+        <Style TargetType="Slider"><Setter Property="ui:InterfaceMotion.Enabled" Value="True"/></Style>
+        <Style TargetType="CheckBox"><Setter Property="ui:InterfaceMotion.Enabled" Value="True"/></Style>
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>

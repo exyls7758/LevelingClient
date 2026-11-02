@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Leveling (Portátil - F5)": {
+      "commandName": "Project",
+      "nativeDebugging": true
+    }
+  }
+}

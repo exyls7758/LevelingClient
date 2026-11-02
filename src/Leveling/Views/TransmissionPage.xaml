@@ -1,0 +1,240 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<Page xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:ui="using:Multiverse.Services" x:Class="Multiverse.Views.TransmissionPage" Background="{StaticResource DesignBackground}" UseLayoutRounding="True">
+    <Grid>
+        <VisualStateManager.VisualStateGroups>
+            <VisualStateGroup>
+                <VisualState>
+                    <VisualState.StateTriggers>
+                        <AdaptiveTrigger MinWindowWidth="1500"/>
+                    </VisualState.StateTriggers>
+                    <VisualState.Setters>
+                        <Setter Target="SideCol.Width" Value="*"/>
+                        <Setter Target="NetworkCard.(Grid.Column)" Value="1"/>
+                        <Setter Target="NetworkCard.(Grid.Row)" Value="0"/>
+                    </VisualState.Setters>
+                </VisualState>
+                <VisualState>
+                    <VisualState.StateTriggers>
+                        <AdaptiveTrigger MinWindowWidth="0"/>
+                    </VisualState.StateTriggers>
+                    <VisualState.Setters>
+                        <Setter Target="SideCol.Width" Value="0"/>
+                        <Setter Target="NetworkCard.(Grid.Column)" Value="0"/>
+                        <Setter Target="NetworkCard.(Grid.Row)" Value="1"/>
+                    </VisualState.Setters>
+                </VisualState>
+            </VisualStateGroup>
+        </VisualStateManager.VisualStateGroups>
+        <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+            <StackPanel Padding="24,4,24,24" Spacing="16">
+                <Border Background="Transparent" CornerRadius="0" MinHeight="72" BorderBrush="Transparent" BorderThickness="0">
+                    <Grid Background="Transparent" Padding="0,8,0,12">
+                        <StackPanel Spacing="5" VerticalAlignment="Center" MaxWidth="460" HorizontalAlignment="Left">
+                            <TextBlock Text="Transmissão" Style="{StaticResource DesignTitle}" FontFamily="Segoe UI Variable Display" FontWeight="Bold" TextWrapping="Wrap"/>
+                            <TextBlock Text="Seu jogo. Na outra tela." Foreground="#8F9CA8" FontSize="13" TextWrapping="Wrap"/>
+                        </StackPanel>
+                    </Grid>
+                </Border>
+                <Grid>
+<ui:CornerGlow AroundCard="True" Width="220" Height="140" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,-36,-28,0"/>
+<Border Style="{StaticResource DesignCard}">
+                    <Grid ColumnSpacing="20">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <Border Style="{StaticResource DesignIconTile}">
+                            <FontIcon Glyph="" FontFamily="Segoe Fluent Icons" FontSize="28" Foreground="{StaticResource DesignAccent}"/>
+                        </Border>
+                        <StackPanel Grid.Column="1" Spacing="7" VerticalAlignment="Center">
+                            <TextBlock x:Name="TransmissionStatusText" Text="Transmissão parada." Style="{StaticResource DesignSectionTitle}"/>
+                            <TextBlock x:Name="TransmissionDetailText" Foreground="#8F9CA8" FontSize="13" TextWrapping="Wrap"/>
+                        </StackPanel>
+                        <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
+                            <Button ui:InterfaceMotion.Enabled="True" x:Name="StartButton" Content="▶  Iniciar transmissão" Click="StartButton_Click" Style="{StaticResource DesignAction}"/>
+                            <Button ui:InterfaceMotion.Enabled="True" x:Name="StopButton" Content="■  Parar" Click="StopButton_Click"/>
+                        </StackPanel>
+                    </Grid>
+                </Border>
+</Grid>
+                <Grid ColumnSpacing="16" RowSpacing="16">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="1.5*"/>
+                        <ColumnDefinition x:Name="SideCol" Width=".85*"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <Grid>
+<ui:CornerGlow AroundCard="True" Width="220" Height="140" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,-36,-28,0"/>
+<Border Style="{StaticResource DesignCard}">
+                        <StackPanel Spacing="10">
+                            <StackPanel Orientation="Horizontal" Spacing="18">
+                                <FontIcon Glyph="" FontFamily="Segoe Fluent Icons" Foreground="{StaticResource DesignAccent}" FontSize="28"/>
+                                <TextBlock Text="Qualidade" Style="{StaticResource DesignSectionTitle}"/>
+                            </StackPanel>
+                            <TextBlock Text="A captura respeita a resolução do monitor." Foreground="#8F9CA8" FontSize="13" TextWrapping="Wrap"/>
+                            <ComboBox x:Name="QualityPresetCombo" Header="Perfil para a próxima transmissão" SelectionChanged="QualityPresetCombo_SelectionChanged">
+                                <ComboBoxItem Content="Leve • 720p60 • 10 Mbps" Tag="720p"/>
+                                <ComboBoxItem Content="Equilibrado • 1080p60 • 20 Mbps" Tag="1080p"/>
+                                <ComboBoxItem Content="Detalhado • 1440p60 • 35 Mbps" Tag="1440p"/>
+                                <ComboBoxItem Content="Personalizado • valores salvos" Tag="custom"/>
+                            </ComboBox>
+                            <Grid ColumnSpacing="8">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Border Grid.Column="0" Style="{StaticResource DesignCard}" Padding="10">
+                                    <StackPanel Spacing="8">
+                                        <TextBlock Text="Resolução" Style="{StaticResource DesignKicker}"/>
+                                        <ComboBox x:Name="ResolutionCombo" SelectedIndex="0">
+                                            <ComboBoxItem Content="720p" Tag="720p"/>
+                                            <ComboBoxItem Content="1080p" Tag="1080p"/>
+                                            <ComboBoxItem Content="1440p" Tag="1440p"/>
+                                        </ComboBox>
+                                    </StackPanel>
+                                </Border>
+                                <Border Grid.Column="1" Style="{StaticResource DesignCard}" Padding="10">
+                                    <StackPanel Spacing="8">
+                                        <TextBlock Text="FPS" Style="{StaticResource DesignKicker}"/>
+                                        <ComboBox x:Name="FpsCombo" SelectedIndex="0">
+                                            <ComboBoxItem Content="30 FPS" Tag="30"/>
+<ComboBoxItem Content="60 FPS" Tag="60"/>
+<ComboBoxItem Content="80 FPS" Tag="80"/>
+<ComboBoxItem Content="90 FPS" Tag="90"/>
+<ComboBoxItem Content="120 FPS" Tag="120"/>
+                                            
+                                        </ComboBox>
+                                    </StackPanel>
+                                </Border>
+                                <Border Grid.Column="2" Style="{StaticResource DesignCard}" Padding="10">
+                                    <StackPanel Spacing="8">
+                                        <TextBlock Text="Bitrate" Style="{StaticResource DesignKicker}"/>
+                                        <ComboBox x:Name="BitrateCombo" SelectedIndex="0">
+                                            <ComboBoxItem Content="5 Mbps" Tag="5000"/>
+                                            <ComboBoxItem Content="10 Mbps" Tag="10000"/>
+                                            <ComboBoxItem Content="15 Mbps" Tag="15000"/>
+                                            <ComboBoxItem Content="20 Mbps" Tag="20000"/>
+                                            <ComboBoxItem Content="30 Mbps" Tag="30000"/>
+                                            <ComboBoxItem Content="35 Mbps" Tag="35000"/>
+                                            <ComboBoxItem Content="40 Mbps" Tag="40000"/>
+                                            <ComboBoxItem Content="50 Mbps" Tag="50000"/>
+                                            <ComboBoxItem Content="75 Mbps" Tag="75000"/>
+                                            <ComboBoxItem Content="100 Mbps" Tag="100000"/>
+                                            <ComboBoxItem Content="150 Mbps" Tag="150000"/>
+                                        </ComboBox>
+                                    </StackPanel>
+                                </Border>
+                                <Border Grid.Column="3" Style="{StaticResource DesignCard}" Padding="10">
+                                    <StackPanel Spacing="8">
+                                        <TextBlock Text="NVENC" Style="{StaticResource DesignKicker}"/>
+                                        <ComboBox x:Name="NvencCombo" SelectedIndex="0">
+                                            <ComboBoxItem Content="Automático" Tag="0"/>
+                                            <ComboBoxItem Content="P1" Tag="1"/>
+                                            <ComboBoxItem Content="P2" Tag="2"/>
+                                            <ComboBoxItem Content="P3" Tag="3"/>
+                                            <ComboBoxItem Content="P4" Tag="4"/>
+                                            <ComboBoxItem Content="P5" Tag="5"/>
+                                            <ComboBoxItem Content="P6" Tag="6"/>
+                                            <ComboBoxItem Content="P7" Tag="7"/>
+                                        </ComboBox>
+                                    </StackPanel>
+                                </Border>
+                            </Grid>
+                            <ToggleSwitch x:Name="LowLatencyToggle" OnContent="Baixa latência do encoder" OffContent="Desativada"/>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock x:Name="ProfileText" Foreground="#8F9CA8" FontSize="13" TextWrapping="Wrap" VerticalAlignment="Center"/>
+                                <Button ui:InterfaceMotion.Enabled="True" x:Name="ApplyProfileButton" Grid.Column="1" Content="Salvar perfil" Click="ApplyProfileButton_Click"/>
+                            </Grid>
+                            <TextBlock x:Name="ProfileHintText" Text="Salve as alterações antes de iniciar." Foreground="#8F9CA8" FontSize="12" TextWrapping="Wrap"/>
+                        </StackPanel>
+                    </Border>
+</Grid>
+                    <Border x:Name="NetworkCard" Grid.Column="1" Style="{StaticResource DesignCard}">
+                        <StackPanel Spacing="18">
+                            <StackPanel Orientation="Horizontal" Spacing="18">
+                                <FontIcon Glyph="" FontFamily="Segoe Fluent Icons" Foreground="{StaticResource DesignAccent}" FontSize="28"/>
+                                <TextBlock Text="Conexão" Style="{StaticResource DesignSectionTitle}"/>
+                            </StackPanel>
+                            <TextBlock Text="Requer Tailscale conectado e acesso autorizado nos dois PCs." Foreground="#8F9CA8" FontSize="13" TextWrapping="Wrap"/>
+                            <Border Style="{StaticResource DesignCard}">
+                                <StackPanel Spacing="12">
+                                    <TextBlock x:Name="RouteTitleText" Text="Pronto para verificar" Style="{StaticResource DesignSectionTitle}"/>
+                                    <TextBlock x:Name="RouteDetailText" Text="A rota será consultada ao verificar a conexão." Foreground="#8F9CA8" FontSize="13" TextWrapping="Wrap"/>
+                                    <Button ui:InterfaceMotion.Enabled="True" x:Name="CheckNetworkButton" Content="Verificar conexão" Click="CheckNetworkButton_Click"/>
+                                </StackPanel>
+                            </Border>
+                            <TextBlock x:Name="NetworkAdviceText" Text="Consulte a rota direta ou relay durante a sessão." Foreground="#8F9CA8" FontSize="13" TextWrapping="Wrap"/>
+                        </StackPanel>
+                    </Border>
+                </Grid>
+                <Border Style="{StaticResource DesignCard}">
+                    <StackPanel Spacing="16">
+                        <TextBlock Text="Desempenho ao vivo" Style="{StaticResource DesignSectionTitle}"/>
+                        <TextBlock Text="Acompanhe as medições reais da transmissão." Foreground="#8F9CA8" FontSize="13" TextWrapping="Wrap"/>
+                        <Grid ColumnSpacing="10">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Border Grid.Column="0" Style="{StaticResource DesignCard}" Padding="12">
+                                <StackPanel Spacing="6">
+                                    <TextBlock Text="FPS" Foreground="#8F9CA8" FontSize="12"/>
+                                    <TextBlock x:Name="PresentMetricText" Text="—" FontSize="18" FontWeight="SemiBold"/>
+                                    <TextBlock Text="FPS observados" Foreground="#8F9CA8" FontSize="11" TextWrapping="Wrap"/>
+                                </StackPanel>
+                            </Border>
+                            <Border Grid.Column="1" Style="{StaticResource DesignCard}" Padding="12">
+                                <StackPanel Spacing="6">
+                                    <TextBlock Text="Latência" Foreground="#8F9CA8" FontSize="12"/>
+                                    <TextBlock x:Name="LatencyMetricText" Text="—" FontSize="18" FontWeight="SemiBold"/>
+                                    <TextBlock Text="Ida e volta da rede" Foreground="#8F9CA8" FontSize="11" TextWrapping="Wrap"/>
+                                </StackPanel>
+                            </Border>
+                            <Border Grid.Column="2" Style="{StaticResource DesignCard}" Padding="12">
+                                <StackPanel Spacing="6">
+                                    <TextBlock Text="Bitrate" Foreground="#8F9CA8" FontSize="12"/>
+                                    <TextBlock x:Name="ReceiveMetricText" Text="—" FontSize="18" FontWeight="SemiBold"/>
+                                    <TextBlock Text="Taxa de transmissão" Foreground="#8F9CA8" FontSize="11" TextWrapping="Wrap"/>
+                                </StackPanel>
+                            </Border>
+                            <Border Grid.Column="3" Style="{StaticResource DesignCard}" Padding="12">
+                                <StackPanel Spacing="6">
+                                    <TextBlock Text="Perdas de pacotes" Foreground="#8F9CA8" FontSize="12"/>
+                                    <TextBlock x:Name="LossMetricText" Text="—" FontSize="18" FontWeight="SemiBold"/>
+                                    <TextBlock Text="Estimativa observada" Foreground="#8F9CA8" FontSize="11" TextWrapping="Wrap"/>
+                                </StackPanel>
+                            </Border>
+                            <Border Grid.Column="4" Style="{StaticResource DesignCard}" Padding="12">
+                                <StackPanel Spacing="6">
+                                    <TextBlock Text="Estabilidade" Foreground="#8F9CA8" FontSize="12"/>
+                                    <TextBlock x:Name="StabilityMetricText" Text="—" FontSize="18" FontWeight="SemiBold"/>
+                                    <TextBlock Text="Atualidade do vídeo" Foreground="#8F9CA8" FontSize="11" TextWrapping="Wrap"/>
+                                </StackPanel>
+                            </Border>
+                        </Grid>
+                        <Expander x:Name="TechnicalDetails" Header="Detalhes técnicos" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch">
+                            <StackPanel Spacing="10">
+                                <TextBlock x:Name="MonitorText" Foreground="#8F9CA8" FontSize="13" TextWrapping="Wrap"/>
+                                <TextBlock x:Name="RuntimeTelemetryTextBlock" Foreground="#8F9CA8" FontSize="12" TextWrapping="Wrap" FontFamily="Consolas"/>
+                            </StackPanel>
+                        </Expander>
+                        <Button ui:InterfaceMotion.Enabled="True" Content="Abrir diagnóstico" Click="OpenAdvancedDiagnosticsButton_Click"/>
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</Page>

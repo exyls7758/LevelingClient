@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="..\..\Services\HostTransmissionService.cs" Link="Production\HostTransmissionService.cs" />
+    <Compile Include="..\..\Services\HostVideoPipelineController.Recovery.cs" Link="Production\HostVideoPipelineController.Recovery.cs" />
+    <Compile Include="..\..\Services\HostVideoPipelineController.Manual.cs" Link="Production\HostVideoPipelineController.Manual.cs" />
+    <Compile Include="..\..\Services\HostPipelineRecoveryTransaction.cs" Link="Production\HostPipelineRecoveryTransaction.cs" />
+    <Compile Include="..\..\Services\HostPipelineRecoveryCoordinator.cs" Link="Production\HostPipelineRecoveryCoordinator.cs" />
+    <Compile Include="..\..\Services\HostPipelineRecoveryPolicy.cs" Link="Production\HostPipelineRecoveryPolicy.cs" />
+    <Compile Include="..\..\Services\HostSenderRecoveryPolicy.cs" Link="Production\HostSenderRecoveryPolicy.cs" />
+    <Compile Include="..\..\Services\ClientTransportRecoveryPolicy.cs" Link="Production\ClientTransportRecoveryPolicy.cs" />
+    <Compile Include="..\..\Services\EncoderStallDetector.cs" Link="Production\EncoderStallDetector.cs" />
+    <Compile Include="..\..\Services\ConfirmedResource.cs" Link="Production\ConfirmedResource.cs" />
+    <Compile Include="..\..\Services\ConfirmedTask.cs" Link="Production\ConfirmedTask.cs" />
+  </ItemGroup>
+</Project>

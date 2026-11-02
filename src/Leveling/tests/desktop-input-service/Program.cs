@@ -1,0 +1,43 @@
+using Multiverse.Services;
+using System.Reflection;
+var service=DesktopInputService.Instance;
+var session=RemoteSessionService.Instance;
+var timer=(Timer)Field("_timer").GetValue(service)!;
+int generation=0, failures=0,count=0;
+Run("host ignores keys before negotiation",()=>{Reset(RemoteSessionRole.Host);Deliver("key",1,2,65,true);Check(WindowsDesktopInputSink.Events.Count==0);});
+Run("valid host handshake then release",()=>{Reset(RemoteSessionRole.Host);Deliver("start",1,1);Check(session.Sent.Last().Kind=="accepted");Deliver("key",1,2,65,true);Deliver("reset",1,3);Check(string.Join(",",WindowsDesktopInputSink.Events)=="K65:True,K65:False");Deliver("key",1,4,66,true);Check(WindowsDesktopInputSink.Events.Count==2);});
+Run("malformed start must not be accepted",()=>{Reset(RemoteSessionRole.Host);Deliver("start",1,0);Check(session.Sent.All(p=>p.Kind!="accepted"));Deliver("start",2,1);Deliver("key",2,2,65,true);Check(WindowsDesktopInputSink.Events.Contains("K65:True"));});
+Run("revoked permission releases held input",()=>{Reset(RemoteSessionRole.Host);Deliver("start",1,1);Deliver("key",1,2,65,true);session.Snapshot.RemoteInputAllowed=false;session.Change();Deliver("key",1,3,66,true);Check(string.Join(",",WindowsDesktopInputSink.Events)=="K65:True,K65:False");});
+Run("host local permission rejects start",()=>{Reset(RemoteSessionRole.Host);service.SetHostAllowed(false);Deliver("start",1,1);Check(session.Sent.Last().Kind=="rejected");});
+Run("reconnect releases and rejects previous generation",()=>{Reset(RemoteSessionRole.Host);Deliver("start",1,1);Deliver("key",1,2,65,true);int old=session.Snapshot.SessionGeneration;session.Snapshot.SessionGeneration=++generation;session.Change();session.Deliver(P("key",1,3,66,true),old);Deliver("start",1,1);Deliver("key",1,2,67,true);Check(string.Join(",",WindowsDesktopInputSink.Events)=="K65:True,K65:False,K67:True");});
+Run("client waits for exact ACK before sending keys",()=>{Reset(RemoteSessionRole.Client);service.BeginCapture();var epoch=session.Sent.Single().Epoch;service.Key(65,true);Check(session.Sent.Count==1&&!service.IsCapturing);Deliver("accepted",epoch-1,1);Check(!service.IsCapturing);Deliver("accepted",epoch,1);Freeze();Check(service.IsCapturing);service.Key(65,true);Check(session.Sent.Last().Kind=="key");});
+Run("unsupported host times out without input",()=>{Reset(RemoteSessionRole.Client);service.BeginCapture();long epoch=session.Sent.Single().Epoch;Set("_requestAt",Environment.TickCount64-1500);Tick();Deliver("accepted",epoch,1);Check(!service.IsCapturing&&session.Sent.All(x=>x.Kind!="key"));});
+Run("host lease loss releases client and requires new epoch",()=>{Reset(RemoteSessionRole.Client);service.BeginCapture();long epoch=session.Sent.Single().Epoch;Deliver("accepted",epoch,1);Freeze();Set("_leaseAt",Environment.TickCount64-800);Tick();Check(!service.IsCapturing&&session.Sent.Last().Kind=="reset");service.BeginCapture();Check(session.Sent.Last().Epoch>epoch);});
+Run("mode switch resets before gamepad",()=>{Reset(RemoteSessionRole.Client);service.BeginCapture();Deliver("accepted",session.Sent.Single().Epoch,1);Freeze();service.Key(65,true);service.SetMode(DesktopInputMode.Gamepad);Check(!service.IsCapturing&&service.Mode==DesktopInputMode.Gamepad&&session.Sent.Last().Kind=="reset");});
+Run("queue overflow fails closed",()=>{Reset(RemoteSessionRole.Client);service.BeginCapture();Deliver("accepted",session.Sent.Single().Epoch,1);Freeze();session.Writable=false;service.Key(65,true);Check(!service.IsCapturing);});
+Run("changing mapping releases active input",()=>{Reset(RemoteSessionRole.Client);service.BeginCapture();Deliver("accepted",session.Sent.Single().Epoch,1);Freeze();service.SaveProfile(new(){Sensitivity=2});Check(!service.IsCapturing&&session.Sent.Last().Kind=="reset");});
+Run("mapper aliases retain target until all sources release",()=>{var p=new KeyboardMouseProfile();p.KeyMap[65]=87;p.KeyMap[66]=87;var m=new DesktopInputMapper(p);Check(m.Key(65,true)==(87,true));Check(m.Key(66,true)==null);Check(m.Key(65,false)==null);Check(m.Key(66,false)==(87,false));Check(m.Key(66,false)==null);});
+Run("mapper profile clone, fractions and inversion",()=>{var p=new KeyboardMouseProfile{Sensitivity=.5,InvertY=true};var m=new DesktopInputMapper(p);p.Sensitivity=3;Check(m.Move(1,1)==(0,0));Check(m.Move(1,1)==(1,-1));Check(m.Move(-2,-2)==(-1,1));});
+Run("mouse remap alias and repeated downs",()=>{var p=new KeyboardMouseProfile();p.MouseMap[4]=1;var m=new DesktopInputMapper(p);Check(m.Button(1,true)==(1,true));Check(m.Button(4,true)==null);Check(m.Button(4,true)==null);Check(m.Button(1,false)==null);Check(m.Button(4,false)==(1,false));});
+Run("invalid profiles rejected",()=>{foreach(var p in new[]{new KeyboardMouseProfile{Sensitivity=double.NaN},new KeyboardMouseProfile{Sensitivity=4},new KeyboardMouseProfile{CaptureShortcut=120},new KeyboardMouseProfile{KeyMap=new(){{1,65}}},new KeyboardMouseProfile{MouseMap=new(){{1,6}}}}){bool threw=false;try{p.Validate();}catch(ArgumentException){threw=true;}Check(threw);}});
+Run("diagnostic durations use the affected stage",()=>{
+ var stages=new Dictionary<string,long>{{"HOST_CAPTURE_GAP",11},{"HOST_CAPTURE_STALL",11},{"HOST_ENCODE_STALL",12},{"HOST_ENCODE_GAP",12},{"HOST_TX_GAP",13},{"CLIENT_UDP_SILENCE",13},{"CLIENT_RX_GAP",13},{"CLIENT_REASSEMBLY_STALL",14},{"CLIENT_FRAME_GAP",14},{"CLIENT_REFERENCE_WAIT",15},{"CLIENT_DECODE_STALL",15},{"CLIENT_PRESENT_GAP",16},{"CLIENT_PRESENTER_STALL",16},{"",0}};
+ foreach(var (reason,expected) in stages)Check(new VideoProgressDecision{Reason=reason,CaptureAgeMs=11,EncodeAgeMs=12,PacketAgeMs=13,FrameAgeMs=14,DecodeAgeMs=15,PresentAgeMs=16}.IncidentDurationMs==expected,reason);
+ Check(new VideoProgressDecision{Reason="CLIENT_RX_GAP",PacketAgeMs=600,EncodeAgeMs=10_000_000}.IncidentDurationMs==600);
+});
+Run("host explains keyboard permission refusal",()=>{Reset(RemoteSessionRole.Host);service.SetHostAllowed(false);Deliver("start",1,1);Check(session.Sent.Last().Reason=="keyboard_permission");});
+Run("keyboard input independent of gamepad toggle",()=>{Reset(RemoteSessionRole.Host);GamepadTuningService.Instance.RemoteInputEnabled=false;Deliver("start",1,1);Check(session.Sent.Last().Kind=="accepted");Tick();Deliver("key",1,2,65,true);Check(WindowsDesktopInputSink.Events.Contains("K65:True"));});
+Run("client displays actionable refusal",()=>{Reset(RemoteSessionRole.Client);service.BeginCapture();session.Deliver(new(){Kind="rejected",Epoch=session.Sent.Single().Epoch,Sequence=1,Reason="master_permission"});Check(!service.IsCapturing&&service.Status.Contains("Controle"));});
+Run("client distinguishes expired lease",()=>{Reset(RemoteSessionRole.Client);service.BeginCapture();Deliver("expired",session.Sent.Single().Epoch,1);Check(service.Status.Contains("silêncio"));});
+Run("release turn preserves host permission",()=>{Reset(RemoteSessionRole.Host);Deliver("start",1,1);Deliver("key",1,2,65,true);service.ReleaseTurn();Check(service.HostAllowed);Check(WindowsDesktopInputSink.Events.Last()=="K65:False");Deliver("start",2,1);Check(session.Sent.Last().Kind=="accepted");});
+Run("explicit host revoke still blocks keyboard",()=>{Reset(RemoteSessionRole.Host);GamepadTuningService.Instance.RemoteInputEnabled=false;service.SetHostAllowed(false);Deliver("start",1,1);Check(session.Sent.Last().Kind=="rejected");});
+timer.Dispose();Console.WriteLine($"{count-failures}/{count} passed; no OS input injected.");return failures==0?0:1;
+FieldInfo Field(string n)=>typeof(DesktopInputService).GetField(n,BindingFlags.Instance|BindingFlags.NonPublic)!;
+void Set(string n,long v)=>Field(n).SetValue(service,v);
+void Freeze()=>timer.Change(Timeout.Infinite,Timeout.Infinite);
+void Tick()=>typeof(DesktopInputService).GetMethod("Tick",BindingFlags.Instance|BindingFlags.NonPublic)!.Invoke(service,null);
+void Reset(RemoteSessionRole role){Freeze();session.Snapshot=new(){Role=role,SessionGeneration=++generation};session.Change();Freeze();session.Writable=true;service.SetHostAllowed(true);GamepadTuningService.Instance.RemoteInputEnabled=true;service.SetMode(DesktopInputMode.Gamepad);session.Sent.Clear();WindowsDesktopInputSink.Events.Clear();}
+DesktopInputPacket P(string k,long e,long s,int c=0,bool d=false)=>new(){Kind=k,Epoch=e,Sequence=s,Code=c,Down=d};
+void Deliver(string k,long e,long s,int c=0,bool d=false)=>session.Deliver(P(k,e,s,c,d));
+void Check(bool ok,string why=""){if(!ok)throw new Exception("Assertion failed "+why);}
+void Run(string name,Action test){count++;try{test();Console.WriteLine("PASS "+name);}catch(Exception ex){failures++;Console.WriteLine("FAIL "+name+" "+ex.Message);}finally{Freeze();}}

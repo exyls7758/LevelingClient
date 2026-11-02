@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files"><UniqueIdentifier>{A8F5F24B-80FD-48EF-985A-A90C91171A9D}</UniqueIdentifier></Filter>
+    <Filter Include="Header Files"><UniqueIdentifier>{5EF35CF1-A340-47E8-B6E0-B7CF50C95F78}</UniqueIdentifier></Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="dllmain.cpp"><Filter>Source Files</Filter></ClCompile>
+    <ClCompile Include="MultiverseCore.cpp"><Filter>Source Files</Filter></ClCompile>
+    <ClInclude Include="MultiverseCore.h"><Filter>Header Files</Filter></ClInclude>
+    <ClInclude Include="CompositionScaleMath.h"><Filter>Header Files</Filter></ClInclude>
+    <ClInclude Include="RemoteFrameDeadlineScheduler.h"><Filter>Header Files</Filter></ClInclude>
+    <ClInclude Include="Core11AdaptivePressureController.h"><Filter>Header Files</Filter></ClInclude>
+  </ItemGroup>
+</Project>

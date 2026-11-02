@@ -1,0 +1,52 @@
+name: Leveling release
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: leveling-release
+  cancel-in-progress: false
+jobs:
+  build-test-release:
+    runs-on: windows-2025
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      - uses: microsoft/setup-msbuild@v2
+      - name: Verify native provenance
+        shell: pwsh
+        run: ./scripts/NativeArtifact.ps1
+      - name: Test
+        shell: pwsh
+        run: ./scripts/Test.ps1
+      - name: Publish WinUI application
+        shell: pwsh
+        run: |
+          msbuild src/Leveling/Leveling.csproj /restore /t:Publish /p:Configuration=Release /p:Platform=x64 /p:UsePrebuiltNative=true /p:PublishDir="$pwd/publish/" /verbosity:minimal
+          if ($LASTEXITCODE -ne 0) { throw 'Build failed' }
+      - name: Install pinned packager
+        run: dotnet tool install vpk --version 1.2.0 --tool-path .tools
+      - name: Test real update lifecycle and package integrity
+        shell: pwsh
+        run: ./scripts/Test-UpdateLifecycle.ps1
+      - name: Package
+        shell: pwsh
+        run: ./scripts/Pack.ps1
+      - name: Publish GitHub Release
+        shell: pwsh
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          [xml]$project=Get-Content src/Leveling/Leveling.csproj
+          $version=$project.Project.PropertyGroup.Version | Where-Object {$_} | Select-Object -First 1
+          if ($env:GITHUB_REF_TYPE -eq 'tag' -and $env:GITHUB_REF_NAME -ne "v$version") {throw 'Tag/version mismatch'}
+          $flags=@('upload','github','--repoUrl',"https://github.com/$env:GITHUB_REPOSITORY",'--token',$env:GITHUB_TOKEN,'--outputDir','Releases','--tag',"v$version",'--releaseName',"Leveling $version",'--targetCommitish',$env:GITHUB_SHA,'--publish')
+          if($version -match '-rc\.'){$flags+='--pre'}
+          & ./.tools/vpk.exe @flags
+          if($LASTEXITCODE -ne 0){throw 'Release upload failed'}

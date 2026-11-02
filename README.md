@@ -31,3 +31,7 @@ Abra a URL publicada em uma janela anônima e confirme que:
 - mostra o contato e a finalidade da integração Microsoft/Minecraft.
 
 Não publique Client Secret, tokens, chaves privadas ou credenciais.
+
+
+## Aplicativo Leveling Stream
+Código Windows em `src/Leveling`. Atualizações e publicação: [UPDATES.md](UPDATES.md). A página pública existente foi preservada.
