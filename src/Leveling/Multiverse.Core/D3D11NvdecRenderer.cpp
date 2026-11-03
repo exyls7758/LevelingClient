@@ -2154,6 +2154,26 @@ D3D11NvdecRenderer::AttachPanel(
         m_impl->Attached.store(false);
         m_impl->CudaDevice = cudaDevice;
 
+        // A removed device cannot be repaired by resizing/reusing its swap chain.
+        // Attach runs with the decoder's CUDA context current, after the presenter
+        // joined; release CUDA registrations before releasing their D3D resources.
+        if (m_impl->Device && FAILED(m_impl->Device->GetDeviceRemovedReason()))
+        {
+            if (m_impl->PanelNative) m_impl->PanelNative->SetSwapChain(nullptr);
+            m_impl->CloseFrameLatencyHandle();
+            m_impl->PanelNative.Reset();
+            m_impl->BackBufferRtv.Reset();
+            m_impl->SwapChain.Reset();
+            m_impl->DestroyPlaneResources();
+            m_impl->Sampler.Reset();
+            m_impl->PixelShader.Reset();
+            m_impl->VertexShader.Reset();
+            m_impl->Context.Reset();
+            m_impl->Device.Reset();
+            m_impl->Factory.Reset();
+            m_impl->Adapter.Reset();
+        }
+
         hr =
             m_impl->CreateDeviceForCuda(
                 cudaDevice);

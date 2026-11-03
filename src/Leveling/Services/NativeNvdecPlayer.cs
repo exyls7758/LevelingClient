@@ -38,6 +38,7 @@ namespace Multiverse.Services
         public double LocalQueueAgeMaxMs { get; init; }
 
         public bool D3D11Attached { get; init; }
+        public int D3D11LastStatus { get; init; }
         public ulong D3D11SubmittedFrames { get; init; }
         public ulong D3D11PresentedFrames { get; init; }
         public ulong D3D11DroppedPresents { get; init; }
@@ -263,11 +264,6 @@ namespace Multiverse.Services
                 if (!_running || _stop) return;
                 Interlocked.Increment(ref _networkFramesReceived);
                 // A dependent frame may enter only after a clean keyframe.
-                if (!_seenKeyFrame && !frame.KeyFrame)
-                {
-                    Interlocked.Increment(ref _waitingForKeyFrameDrops);
-                    return;
-                }
                 if (_queue.Count >= MaxCompressedQueue)
                 {
                     RecoverFromBacklogLocked();
@@ -276,6 +272,10 @@ namespace Multiverse.Services
                 if (!_seenKeyFrame && !frame.KeyFrame)
                 {
                     Interlocked.Increment(ref _waitingForKeyFrameDrops);
+                    // An initial IDR request can race encoder startup or be lost.
+                    // Keep requesting through the existing cooldown while deltas
+                    // arrive; otherwise a low-motion source can wait indefinitely.
+                    requestIdr = true;
                 }
                 else
                 {
@@ -502,6 +502,7 @@ namespace Multiverse.Services
 
                 D3D11Attached =
                     renderer?.Attached == true,
+                D3D11LastStatus = renderer?.LastStatus ?? 0,
 
                 D3D11SubmittedFrames =
                     renderer?.SubmittedFrames ?? 0,

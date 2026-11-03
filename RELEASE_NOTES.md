@@ -1,8 +1,8 @@
-# Leveling 11.75.1 RC5
+# Leveling 11.75.1 RC6
 
-- Corrige recepção de áudio em conexões IPv6, com regressão UDP IPv4/IPv6 e ciclos de parar/iniciar.
-- Saída salva inativa passa a usar a saída padrão do Windows.
-- Aba Áudio atualiza status e contadores enquanto aberta; envio conta pacotes efetivamente enviados.
-- Adiciona Ouvir áudio / Reconectar saída no cliente e atualização da lista de dispositivos.
-- Permite retomar áudio automático sem reiniciar vídeo e evita reativar o botão durante uma abertura pendente.
-- Reprodução audível em dois PCs, remoção física de fones e qualidade sonora não foram validadas nesta revisão.
+- Recria os recursos D3D11 quando a reconexão da superfície encontra um dispositivo removido/resetado.
+- Falhas de apresentação passam a reconectar a superfície, em vez de repetir Resize no dispositivo inválido.
+- Detecta decodificação ativa com apresentação parada e tenta recuperar somente a superfície, com intervalo e limite de tentativas.
+- Testes de ausência de vídeo, Present em andamento, limite, intervalo e nova sessão.
+- A origem do reset do driver e a recuperação no PC remoto ainda exigem validação; não há garantia de 120 FPS nem eliminação de todas as falhas.
+- Repete pedidos de quadro-chave durante espera por IDR, respeitando o cooldown existente, para recuperar pedidos perdidos na partida.

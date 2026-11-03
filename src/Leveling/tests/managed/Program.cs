@@ -313,6 +313,7 @@ static void IntervalTests()
 try
 {
 LeaseTests();
+PresenterRecoveryTests.Run();
 var recoveryQueue = new CodedFrameQueue<int>(4);
 recoveryQueue.TryEnqueue(1);
 Check(recoveryQueue.ClearForDiscontinuity() == 1, "recovery clears old references");

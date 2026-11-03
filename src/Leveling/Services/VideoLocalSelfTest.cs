@@ -13,7 +13,7 @@ namespace Multiverse.Services;
 // No remote session, friend authorization, or saved stream setting is changed.
 internal static class VideoLocalSelfTest
 {
-    internal static async Task RunAsync(string output, bool qhd, int seconds = 15, uint fps = 60)
+    internal static async Task RunAsync(string output, bool qhd, int seconds = 15, uint fps = 60, bool exercisePresentation = false)
     {
         NativeCaptureSession? capture = null;
         NativeNvdecPlayer? decoder = null;
@@ -71,17 +71,27 @@ internal static class VideoLocalSelfTest
             sender.Start();
             capture.RequestIdr();
             ulong firstPresented = 0;
+            ulong beforeReattach = 0;
             long baseHandles=0, basePrivate=0;
             var elapsed=Stopwatch.StartNew();
             for (int second = 1; second <= seconds; second++)
             {
                 await Task.Delay(1000);
                 var d = decoder.GetSnapshot(); var rx = receiver.GetSnapshot();
+                if (exercisePresentation && second is 10 or 20)
+                {
+                    beforeReattach = d.D3D11PresentedFrames;
+                    await window.DetachRendererAsync();
+                    window.SetDecoder(decoder);
+                    Log($"SURFACE_REATTACH second={second} before={beforeReattach}");
+                }
+                if (exercisePresentation && second is 15 or 25 && d.D3D11PresentedFrames <= beforeReattach + 3)
+                    throw new InvalidOperationException("Presentation did not resume after surface reattach");
                 if (second == 5) firstPresented = d.D3D11PresentedFrames;
                 var c=capture.GetCapturePipelineStatsDiagnostic(); var e=capture.GetEncoderStatsDiagnostic();
                 using var process=Process.GetCurrentProcess(); process.Refresh();
                 if(second==10){baseHandles=process.HandleCount; basePrivate=process.PrivateMemorySize64;}
-                Log($"SAMPLE second={second} elapsedMs={elapsed.ElapsedMilliseconds} captured={c?.BackendFramesPublished} encoded={e?.EncodedFrames} received={d.NetworkFramesReceived} submitted={d.NativeFramesSubmitted} decoded={d.DecodedPictures} attached={d.D3D11Attached} presented={d.D3D11PresentedFrames} queueP95ms={d.LocalQueueAgeP95Ms:0.0} handles={process.HandleCount} privateMB={process.PrivateMemorySize64/1048576} error={d.LastError}");
+                Log($"SAMPLE second={second} elapsedMs={elapsed.ElapsedMilliseconds} captured={c?.BackendFramesPublished} encoded={e?.EncodedFrames} received={d.NetworkFramesReceived} submitted={d.NativeFramesSubmitted} decoded={d.DecodedPictures} attached={d.D3D11Attached} presented={d.D3D11PresentedFrames} queueP95ms={d.LocalQueueAgeP95Ms:0.0} referenceWait={d.WaitingForKeyFrameDrops} idrRequests={d.RecoveryIdrRequests} rendererStatus={d.D3D11LastStatus} handles={process.HandleCount} privateMB={process.PrivateMemorySize64/1048576} error={d.LastError}");
                 if(second==seconds) Log($"RESOURCES since10s handlesDelta={process.HandleCount-baseHandles} privateMBDelta={(process.PrivateMemorySize64-basePrivate)/1048576}");
             }
             var final = decoder.GetSnapshot();

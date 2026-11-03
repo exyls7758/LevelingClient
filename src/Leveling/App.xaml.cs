@@ -82,7 +82,7 @@ namespace Multiverse
                     int seconds = durationIndex >= 0 && durationIndex + 1 < command.Length && int.TryParse(command[durationIndex + 1], out int parsed) ? parsed : 15;
                     int fpsIndex = Array.IndexOf(command, "--fps");
                     uint fps = fpsIndex >= 0 && fpsIndex + 1 < command.Length && uint.TryParse(command[fpsIndex + 1], out uint parsedFps) ? parsedFps : 60u;
-                    _ = VideoLocalSelfTest.RunAsync(command[selfTest + 1], command.Contains("--qhd"), seconds, fps);
+                    _ = VideoLocalSelfTest.RunAsync(command[selfTest + 1], command.Contains("--qhd"), seconds, fps, command.Contains("--exercise-presentation"));
                     return;
                 }
                 _window = new MainWindow();

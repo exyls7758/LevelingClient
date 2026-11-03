@@ -8,6 +8,7 @@
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="PresenterRecoveryTests.cs"/><Compile Include="../../Services/PresenterRecoveryPolicy.cs"/>
     <Compile Include="Program.cs" /><Compile Include="VideoGenerationIdentityTests.cs" /><Compile Include="../../Services/VideoGenerationIdentity.cs" /><Compile Include="EncoderStallDetectorTests.cs" /><Compile Include="../../Services/EncoderStallDetector.cs" /><Compile Include="ConfirmedPipelineTests.cs" /><Compile Include="../../Services/HostPipelineRecoveryTransaction.cs" />
     <Compile Include="TransportRecoveryTests.cs" />
     <Compile Include="../../Services/ClientTransportRecoveryPolicy.cs" Link="ClientTransportRecoveryPolicy.cs" />

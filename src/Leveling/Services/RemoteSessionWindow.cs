@@ -35,6 +35,7 @@ namespace Multiverse.Services
         private readonly TextBlock _hudText;
         private readonly TextBlock _presentationStatus;
         private readonly PresentationRetry _presentationRetry = new();
+        private readonly PresenterRecoveryPolicy _presenterRecovery = new();
         private readonly ClientVideoStatus _videoStatus = new();
         private bool _presentationFailed;
         private readonly RemoteSessionService _session =
@@ -363,6 +364,7 @@ namespace Multiverse.Services
             {
                 DetachRendererCore();
                 _decoder = decoder;
+                _presenterRecovery.Reset();
                 _presentationRetry.Reset();
                 _presentationFailed = false;
                 _resizeTimer.Interval = TimeSpan.FromMilliseconds(80);
@@ -509,6 +511,15 @@ namespace Multiverse.Services
                 var session = _session.GetSnapshot();
                 if (!session.Connected || session.Role != RemoteSessionRole.Client) return;
                 var decoder = _decoder.GetSnapshot();
+                if (_rendererAttached && _presenterRecovery.Observe(Environment.TickCount64,
+                    decoder.DecodedPictures, decoder.D3D11PresentedFrames, decoder.D3D11PresentInFlight))
+                {
+                    StartupDiagnostics.Stage("CLIENT_PRESENTER_REATTACH", "Decoded frames advance while presentation is stopped.");
+                    DetachRendererCore();
+                    _compositionScaleKnown = false;
+                    AttachOrResize();
+                    return;
+                }
                 var transport = RemoteStreamingRuntime.Instance.GetState().Transport?.GetSnapshot();
                 string message = _videoStatus.Observe(Environment.TickCount64,
                     session.SessionGeneration, session.StreamConfig?.Generation ?? 0,
@@ -716,6 +727,10 @@ namespace Multiverse.Services
                 _ = _session.ReportClientVideoStartupFailureAsync(config.Generation, session.SessionGeneration, reason);
             if (_presentationRetry.TrySchedule())
             {
+                // Repeating Resize on a removed D3D device cannot recover it.
+                // Reattach rebuilds the lost device and its dependent resources.
+                DetachRendererCore();
+                _compositionScaleKnown = false;
                 _resizeTimer.Interval = TimeSpan.FromMilliseconds(500);
                 _resizeTimer.Start();
             }
