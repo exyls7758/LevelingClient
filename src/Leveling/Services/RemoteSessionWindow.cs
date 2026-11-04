@@ -362,7 +362,7 @@ namespace Multiverse.Services
 
             if (!ReferenceEquals(_decoder, decoder))
             {
-                DetachRendererCore();
+                if (!DetachRendererCore()) return;
                 _decoder = decoder;
                 _presenterRecovery.Reset();
                 _presentationRetry.Reset();
@@ -381,8 +381,8 @@ namespace Multiverse.Services
 
             if (_dispatcher is null || _dispatcher.HasThreadAccess)
             {
-                DetachRendererCore();
-                return Task.CompletedTask;
+                return DetachRendererCore() ? Task.CompletedTask :
+                    Task.FromException(new TimeoutException("A superfície ainda está em uso."));
             }
 
             var completion = new TaskCompletionSource<bool>(
@@ -391,27 +391,33 @@ namespace Multiverse.Services
             if (!_dispatcher.TryEnqueue(
                     () =>
                     {
-                        DetachRendererCore();
-                        completion.TrySetResult(true);
+                        if (DetachRendererCore()) completion.TrySetResult(true);
+                        else completion.TrySetException(new TimeoutException("A superfície ainda está em uso."));
                     }))
             {
                 // If the dispatcher is already gone, the XAML window is being
                 // destroyed and owns release of its panel reference. Native
                 // teardown may continue without calling XAML from this thread.
-                completion.TrySetResult(false);
+                completion.TrySetException(new InvalidOperationException("A janela encerrou antes de confirmar a liberação da superfície."));
             }
 
             return completion.Task;
         }
 
-        private void DetachRendererCore()
+        private bool DetachRendererCore()
         {
-            try { _decoder?.DetachRenderer(); } catch { }
+            try { _decoder?.DetachRenderer(); }
+            catch (Exception ex)
+            {
+                StartupDiagnostics.RecordException("CLIENT_PRESENTER_DETACH_PENDING", ex);
+                return false;
+            }
             _rendererAttached = false;
             _lastRenderWidth = 0;
             _lastRenderHeight = 0;
             _compositionScaleKnown = false;
             _resizeTimer.Stop();
+            return true;
         }
 
         private void Root_SizeChanged(object sender, SizeChangedEventArgs e)
@@ -515,7 +521,7 @@ namespace Multiverse.Services
                     decoder.DecodedPictures, decoder.D3D11PresentedFrames, decoder.D3D11PresentInFlight))
                 {
                     StartupDiagnostics.Stage("CLIENT_PRESENTER_REATTACH", "Decoded frames advance while presentation is stopped.");
-                    DetachRendererCore();
+                    if (!DetachRendererCore()) return;
                     _compositionScaleKnown = false;
                     AttachOrResize();
                     return;
@@ -744,9 +750,10 @@ namespace Multiverse.Services
             _hudTimer.Stop();
             _hudBorder.Visibility = Visibility.Collapsed;
             _cursorVisual.Visibility = Visibility.Collapsed;
-            DetachRendererCore();
+            bool detached = DetachRendererCore();
             Closed?.Invoke(this, EventArgs.Empty);
-            _closeCompletion?.TrySetResult(true);
+            if (detached) _closeCompletion?.TrySetResult(true);
+            else _closeCompletion?.TrySetException(new TimeoutException("A superfície ainda está em uso."));
             _closeCompletion = null;
         }
 
@@ -801,7 +808,7 @@ namespace Multiverse.Services
 
             _desktopInput?.Dispose();
             _desktopInput=null;
-            DetachRendererCore();
+            if (!DetachRendererCore()) return;
             _disposed = true;
             _cursorTimer.Stop();
             _cursorTimer.Tick -= CursorTimer_Tick;

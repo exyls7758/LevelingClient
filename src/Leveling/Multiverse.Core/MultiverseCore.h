@@ -561,6 +561,8 @@ MV_API void __cdecl
 MV_DecoderDetachSwapChainPanel(
     void* decoderHandle);
 
+MV_API std::int32_t __cdecl MV_DecoderTryDetachPanel(void* decoderHandle);
+
 MV_API std::int32_t __cdecl
 MV_DecoderGetD3D11RendererStats(
     void* decoderHandle,

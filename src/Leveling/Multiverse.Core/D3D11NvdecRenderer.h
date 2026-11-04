@@ -85,6 +85,7 @@ public:
     std::int32_t SetCompositionScale(float scaleX, float scaleY);
 
     void DetachPanel();
+    bool TryStopPresenter();
 
     void Shutdown();
 

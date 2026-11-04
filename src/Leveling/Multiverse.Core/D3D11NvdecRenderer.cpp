@@ -1,6 +1,7 @@
 #include "D3D11NvdecRenderer.h"
 #include "CompositionScaleMath.h"
 #include "UnlockedPresentation.h"
+#include "PresenterJoin.h"
 
 #if defined(MULTIVERSE_NVDEC)
 
@@ -1366,7 +1367,7 @@ struct D3D11NvdecRenderer::Impl
     }
 
     HRESULT DrawSlot(
-        PlaneSlot& slot, std::unique_lock<std::mutex>& stateLock)
+        PlaneSlot& slot, std::unique_lock<std::mutex>& stateLock, UINT presentFlags)
     {
         if (!SwapChain ||
             !BackBufferRtv ||
@@ -1577,7 +1578,7 @@ struct D3D11NvdecRenderer::Impl
         // other slots while DXGI waits for the compositor.
         auto presentingChain = SwapChain;
         HRESULT hr = multiverse::InvokePresentation(stateLock, [&] {
-            return presentingChain->Present(0, 0);
+            return presentingChain->Present(0, presentFlags);
         });
 
         const auto presentCallEnd =
@@ -1869,6 +1870,7 @@ struct D3D11NvdecRenderer::Impl
             HANDLE waitable =
                 FrameLatencyWaitable;
             bool frameLatencyReady = true;
+            UINT presentFlags = 0;
 
             if (waitable)
             {
@@ -1930,6 +1932,7 @@ struct D3D11NvdecRenderer::Impl
                 {
                     ConsecutiveFrameLatencyTimeouts.store(0);
                     frameLatencyReady = true;
+                    presentFlags = DXGI_PRESENT_DO_NOT_WAIT;
                     FrameLatencyForcedPresents.fetch_add(1);
                 }
             }
@@ -2019,7 +2022,7 @@ struct D3D11NvdecRenderer::Impl
                             Slots.size())
                     {
                         hr = DrawSlot(
-                            Slots[static_cast<std::size_t>(slot)], stateLock);
+                            Slots[static_cast<std::size_t>(slot)], stateLock, presentFlags);
                     }
                 }
 
@@ -2083,17 +2086,13 @@ struct D3D11NvdecRenderer::Impl
                 });
     }
 
-    void StopPresenter()
+    bool StopPresenter(DWORD timeoutMs = INFINITE)
     {
         PresenterStop.store(true);
         QueueCv.notify_all();
 
-        if (PresenterThread.joinable() &&
-            PresenterThread.get_id() !=
-                std::this_thread::get_id())
-        {
-            PresenterThread.join();
-        }
+        if (!multiverse::JoinPresenter(PresenterThread, timeoutMs))
+            return false;
 
         PresenterRunning.store(false);
 
@@ -2102,6 +2101,7 @@ struct D3D11NvdecRenderer::Impl
         PendingSlot = -1;
         PresentingSlot = -1;
         CopyingSlot = -1;
+        return true;
     }
 
     void CloseFrameLatencyHandle()
@@ -2143,7 +2143,8 @@ D3D11NvdecRenderer::AttachPanel(
         return E_POINTER;
     }
 
-    m_impl->StopPresenter();
+    if (!m_impl->StopPresenter(100))
+        return HRESULT_FROM_WIN32(WAIT_TIMEOUT);
 
     HRESULT hr = S_OK;
 
@@ -2228,14 +2229,16 @@ D3D11NvdecRenderer::Resize(
     // Do not stop/restart the presenter when only a redundant XAML size
     // notification arrived. The state lock also protects the size snapshot.
     {
-        std::lock_guard lock(m_impl->StateMutex);
-        if (m_impl->Attached.load() && m_impl->PresenterRunning.load() &&
+        std::unique_lock lock(m_impl->StateMutex, std::try_to_lock);
+        if (lock.owns_lock() && !m_impl->PresenterStop.load() &&
+            m_impl->Attached.load() && m_impl->PresenterRunning.load() &&
             std::max<std::uint32_t>(width, 2u) == m_impl->TargetWidth &&
             std::max<std::uint32_t>(height, 2u) == m_impl->TargetHeight)
             return 0;
     }
 
-    m_impl->StopPresenter();
+    if (!m_impl->StopPresenter(100))
+        return HRESULT_FROM_WIN32(WAIT_TIMEOUT);
 
     HRESULT hr = S_FALSE;
     bool restart = false;
@@ -2272,7 +2275,8 @@ D3D11NvdecRenderer::SetCompositionScale(float scaleX, float scaleY)
     if (!CompositionScaleMath::Valid(scaleX, scaleY))
         return E_INVALIDARG;
 
-    std::lock_guard lock(m_impl->StateMutex);
+    std::unique_lock lock(m_impl->StateMutex, std::try_to_lock);
+    if (!lock.owns_lock()) return HRESULT_FROM_WIN32(WAIT_TIMEOUT);
     const float previousX = m_impl->CompositionScaleX;
     const float previousY = m_impl->CompositionScaleY;
     m_impl->CompositionScaleX = scaleX;
@@ -2286,6 +2290,11 @@ D3D11NvdecRenderer::SetCompositionScale(float scaleX, float scaleY)
         m_impl->SetMessage(HrText(L"SetMatrixTransform", hr));
     }
     return HrStatus(hr);
+}
+
+bool D3D11NvdecRenderer::TryStopPresenter()
+{
+    return !m_impl || m_impl->StopPresenter(100);
 }
 
 void
@@ -2422,7 +2431,8 @@ D3D11NvdecRenderer::PresentNv12(
 
     if (!sourceResourcesReady)
     {
-        m_impl->StopPresenter();
+        if (!m_impl->StopPresenter(100))
+            return HRESULT_FROM_WIN32(WAIT_TIMEOUT);
 
         HRESULT resourceHr = S_OK;
         bool restartPresenter = false;

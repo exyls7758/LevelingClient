@@ -755,11 +755,15 @@ namespace
 
         void DetachSwapChainPanel()
         {
-            if (m_renderer)
-            {
-                m_renderer->
-                    DetachPanel();
-            }
+            if (m_renderer) m_renderer->DetachPanel();
+        }
+
+        std::int32_t TryDetachPanel()
+        {
+            if (m_renderer && !m_renderer->TryStopPresenter())
+                return HRESULT_FROM_WIN32(WAIT_TIMEOUT);
+            DetachSwapChainPanel();
+            return 0;
         }
 
         void FillRendererStats(
@@ -2294,6 +2298,17 @@ MV_DecoderSetCompositionScale(
     (void)scaleX;
     (void)scaleY;
     return -20022;
+#endif
+}
+
+std::int32_t __cdecl MV_DecoderTryDetachPanel(void* decoderHandle)
+{
+#if defined(MULTIVERSE_NVDEC)
+    auto* decoder = static_cast<NativeNvdecDecoder*>(decoderHandle);
+    return decoder ? decoder->TryDetachPanel() : 0;
+#else
+    (void)decoderHandle;
+    return 0;
 #endif
 }
 

@@ -1,10 +1,19 @@
 #include "../../src/Leveling/Multiverse.Core/UnlockedPresentation.h"
+#include "../../src/Leveling/Multiverse.Core/PresenterJoin.h"
 #include <future>
 #include <iostream>
 #include <stdexcept>
 #include <chrono>
 int main() {
     using namespace std::chrono_literals;
+    std::promise<void> releaseDriver;
+    auto released = releaseDriver.get_future();
+    std::thread presenter([&] { released.wait_for(2s); });
+    auto stoppedEarly = multiverse::JoinPresenter(presenter, 30);
+    auto retained = presenter.joinable();
+    releaseDriver.set_value();
+    if (!multiverse::JoinPresenter(presenter, 2000) || stoppedEarly || !retained) return 3;
+    std::cout << "PASS stalled presenter retained after deadline and joined on retry\n";
     std::mutex state;
     std::unique_lock lock(state);
     std::promise<void> copyCompleted;

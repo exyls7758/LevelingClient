@@ -550,7 +550,7 @@ namespace Multiverse.Services
             IntPtr decoderHandle, float scaleX, float scaleY);
 
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
-        private static extern void MV_DecoderDetachSwapChainPanel(
+        private static extern int MV_DecoderTryDetachPanel(
             IntPtr decoderHandle);
 
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
@@ -1255,9 +1255,11 @@ namespace Multiverse.Services
         }
 
         internal static void DecoderDetachSwapChainPanel(
-            IntPtr handle) =>
-            MV_DecoderDetachSwapChainPanel(
-                handle);
+            IntPtr handle)
+        {
+            if (MV_DecoderTryDetachPanel(handle) < 0)
+                throw new TimeoutException("A apresentação ainda está em andamento. Os recursos continuam reservados.");
+        }
 
         internal static D3D11RendererStats? DecoderRendererStats(
             IntPtr handle)
@@ -2019,7 +2021,8 @@ namespace Multiverse.Services
             uint width,
             uint height)
         {
-            lock (_sync)
+            if (!System.Threading.Monitor.TryEnter(_sync, 100)) return unchecked((int)0x80070102);
+            try
             {
                 return _handle == IntPtr.Zero
                     ? -1
@@ -2029,13 +2032,15 @@ namespace Multiverse.Services
                         width,
                         height);
             }
+            finally { System.Threading.Monitor.Exit(_sync); }
         }
 
         public int ResizeSwapChain(
             uint width,
             uint height)
         {
-            lock (_sync)
+            if (!System.Threading.Monitor.TryEnter(_sync, 100)) return unchecked((int)0x80070102);
+            try
             {
                 return _handle == IntPtr.Zero
                     ? -1
@@ -2044,20 +2049,25 @@ namespace Multiverse.Services
                         width,
                         height);
             }
+            finally { System.Threading.Monitor.Exit(_sync); }
         }
 
         public int SetCompositionScale(float scaleX, float scaleY)
         {
-            lock (_sync)
+            if (!System.Threading.Monitor.TryEnter(_sync, 100)) return unchecked((int)0x80070102);
+            try
             {
                 return _handle == IntPtr.Zero ? -1 :
                     NativeCoreService.DecoderSetCompositionScale(_handle, scaleX, scaleY);
             }
+            finally { System.Threading.Monitor.Exit(_sync); }
         }
 
         public void DetachSwapChainPanel()
         {
-            lock (_sync)
+            if (!System.Threading.Monitor.TryEnter(_sync, 100))
+                throw new TimeoutException("O decoder ainda está usando a superfície.");
+            try
             {
                 if (_handle != IntPtr.Zero)
                 {
@@ -2065,17 +2075,24 @@ namespace Multiverse.Services
                         _handle);
                 }
             }
+            finally { System.Threading.Monitor.Exit(_sync); }
         }
+
+        private volatile D3D11RendererStats? _lastRendererStats;
+        private volatile NvdecStats? _lastDecoderStats;
+        private volatile string _lastDecoderMessage = "";
 
         public D3D11RendererStats? GetRendererStats()
         {
-            lock (_sync)
+            if (!System.Threading.Monitor.TryEnter(_sync, 1)) return _lastRendererStats;
+            try
             {
-                return _handle == IntPtr.Zero
+                return _lastRendererStats = _handle == IntPtr.Zero
                     ? null
                     : NativeCoreService.DecoderRendererStats(
                         _handle);
             }
+            finally { System.Threading.Monitor.Exit(_sync); }
         }
 
         public int SignalDiscontinuity()
@@ -2091,13 +2108,15 @@ namespace Multiverse.Services
 
         public NvdecStats? GetStats()
         {
-            lock (_sync)
+            if (!System.Threading.Monitor.TryEnter(_sync, 1)) return _lastDecoderStats;
+            try
             {
-                return _handle == IntPtr.Zero
+                return _lastDecoderStats = _handle == IntPtr.Zero
                     ? null
                     : NativeCoreService.DecoderStats(
                         _handle);
             }
+            finally { System.Threading.Monitor.Exit(_sync); }
         }
 
         public NvdecPreviewResult ReadLatestPreview()
@@ -2166,13 +2185,15 @@ namespace Multiverse.Services
 
         public string GetMessage()
         {
-            lock (_sync)
+            if (!System.Threading.Monitor.TryEnter(_sync, 1)) return _lastDecoderMessage;
+            try
             {
-                return _handle == IntPtr.Zero
+                return _lastDecoderMessage = _handle == IntPtr.Zero
                     ? "NVDEC fechado."
                     : NativeCoreService.DecoderMessage(
                         _handle);
             }
+            finally { System.Threading.Monitor.Exit(_sync); }
         }
 
         public void Dispose()
