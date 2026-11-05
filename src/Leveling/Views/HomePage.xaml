@@ -186,10 +186,15 @@
                                                             </Button>
                                                         </Grid>
                                                         <TextBlock x:Name="TopStatusText" Visibility="Collapsed" Text="Verificando" Foreground="#E62D4F"/>
-                                                        <TextBlock Text="Digite o código do computador autorizado." Style="{StaticResource Caption}"/>
+                                                        <ComboBox x:Name="ConnectionPathCombo" Header="Caminho da conexão" SelectedIndex="0" SelectionChanged="ConnectionPathCombo_SelectionChanged" HorizontalAlignment="Stretch">
+                                                            <ComboBoxItem Content="Tailscale · padrão"/>
+                                                            <ComboBoxItem Content="Direto na rede local · experimental"/>
+                                                        </ComboBox>
+                                                        <TextBlock x:Name="ConnectionPathHint" Text="Para conectar entre redes diferentes, use o endereço Tailscale e o código do host." Style="{StaticResource Caption}"/>
                                                         <TextBox x:Name="ConnectCodeTextBox" Visibility="Collapsed"/>
                                                         <TextBox x:Name="ConnectCodeEntryTextBox" PlaceholderText="Código ou IP:porta#código"/>
                                                         <Button ui:InterfaceMotion.Enabled="True" x:Name="ConnectionButton" Content="Conectar" Click="ConnectButton_Click" HorizontalAlignment="Stretch" Padding="14,10"/>
+                                                        <Button x:Name="UseTailscaleButton" Content="Voltar ao Tailscale" Click="UseTailscaleButton_Click" Visibility="Collapsed" HorizontalAlignment="Stretch"/>
                                                         <Button x:Name="OpenVideoButton" Content="Abrir vídeo" Click="OpenVideoButton_Click" Visibility="Collapsed" HorizontalAlignment="Stretch"/>
                                                         <TextBlock x:Name="VideoStartupStatusText" TextWrapping="Wrap" Foreground="#FF9BB8" Visibility="Collapsed"/>
                                                         <TextBlock x:Name="ConnectionStateTextBlock" Style="{StaticResource Caption}"/>

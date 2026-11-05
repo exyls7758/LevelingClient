@@ -264,7 +264,9 @@ namespace Multiverse.Views
             var profile = _settings.GetStreamProfile();
             LocalProfileText.Text = $"Windows • perfil até {profile.MaxHeight}p / {profile.Fps} FPS";
             LocalMachineCodeTextBlock.Text = snapshot.LocalCode;
-            LocalDirectEndpointTextBlock.Text = snapshot.LocalDirectAddress;
+            LocalDirectEndpointTextBlock.Text = ConnectionPathCombo.SelectedIndex==1 ? _session.GetLocalLanAddress() : snapshot.LocalDirectAddress;
+            ConnectionPathCombo.IsEnabled = !snapshot.Connected && !_connectBusy;
+            UseTailscaleButton.IsEnabled = !snapshot.Connected && !_connectBusy;
             LocalTailscaleIpTextBlock.Text = string.IsNullOrWhiteSpace(snapshot.CurrentTailscaleIp)
                 ? "Tailscale indisponível"
                 : snapshot.CurrentTailscaleIp;
@@ -294,6 +296,7 @@ namespace Multiverse.Views
                 ConnectionStateTextBlock.Text = snapshot.Role == RemoteSessionRole.Host
                     ? $"HOST • {snapshot.RemoteName} • {snapshot.RemoteAddress}"
                     : $"CLIENTE • {snapshot.RemoteName} • {snapshot.RemoteAddress}";
+                ConnectionStateTextBlock.Text += "\n" + snapshot.ConnectionPath;
 
                 HomeLatencyValueTextBlock.Text = snapshot.RoundTripMs > 0 ? $"{snapshot.RoundTripMs:0.0} ms" : "-- ms";
                 HomeLatencyCaptionTextBlock.Text = snapshot.BaseRoundTripMs > 0
@@ -402,6 +405,25 @@ namespace Multiverse.Views
             }
         }
 
+        private void ConnectionPathCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if(ConnectionPathHint is null || UseTailscaleButton is null)return;
+            bool direct=ConnectionPathCombo.SelectedIndex==1;
+            ConnectionPathHint.Text=direct
+                ? "Somente em rede local confiável. Use IP:porta#código do host. Não atravessa a internet nem dispensa Tailscale entre redes diferentes."
+                : "Para redes diferentes, use o endereço 100.x do Tailscale e o código do host. Amigos continuam usando Tailscale.";
+            UseTailscaleButton.Visibility=direct?Visibility.Visible:Visibility.Collapsed;
+            if(LocalDirectEndpointTextBlock is not null)
+                LocalDirectEndpointTextBlock.Text=direct?_session.GetLocalLanAddress():_session.GetSnapshot().LocalDirectAddress;
+        }
+
+        private void UseTailscaleButton_Click(object sender, RoutedEventArgs e)
+        {
+            if(_connectBusy || _session.GetSnapshot().Connected)return;
+            ConnectionPathCombo.SelectedIndex=0;
+            ConnectCodeEntryTextBox.Text="";
+        }
+
         private async void ConnectButton_Click(object sender, RoutedEventArgs e)
         {
             if (_connectBusy)
@@ -456,7 +478,8 @@ namespace Multiverse.Views
             try
             {
                 await PlayConnectFeedbackAsync();
-                RemoteConnectResult result = await _session.ConnectAsync(target);
+                var path=ConnectionPathCombo.SelectedIndex==1?ConnectionPath.LocalDirect:ConnectionPath.Tailscale;
+                RemoteConnectResult result = await _session.ConnectAsync(target,path);
                 await ShowConnectionFeedbackAsync(result.Message);
                 if (!result.Success)
                     return;

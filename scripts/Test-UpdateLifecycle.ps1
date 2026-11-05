@@ -36,4 +36,32 @@ try {
  $failure=Get-Content "$corruptRoot/failed.txt" -Raw
  if($failure -notmatch 'Checksum|checksum|SHA256|hash'){throw "Unexpected rejection: $failure"}
  Write-Output 'PASS corrupted package rejected before installation/restart'
-} finally {Remove-Item Env:LEVELING_UPDATE_TEST_ROOT -ErrorAction SilentlyContinue; Pop-Location}
+ $rollbackRoot=Join-Path $testRoot 'rollback'
+ New-Item -ItemType Directory -Force "$rollbackRoot/feed" | Out-Null
+ Copy-Item "$testRoot/baseline/*" "$rollbackRoot/feed/"
+ Expand-Archive -LiteralPath "$testRoot/feed/LevelingUpdateTest-win-Portable.zip" -DestinationPath "$rollbackRoot/installed"
+ $env:LEVELING_UPDATE_TEST_ROOT=$rollbackRoot
+ $env:LEVELING_UPDATE_TEST_ROLLBACK='1'
+ $exe=Get-ChildItem "$rollbackRoot/installed" -Filter UpdateLifecycle.exe -Recurse | Select-Object -First 1
+ Start-Process -FilePath $exe.FullName -WindowStyle Hidden
+ $deadline=(Get-Date).AddSeconds(60)
+ while(!(Test-Path "$rollbackRoot/restarted.txt") -and !(Test-Path "$rollbackRoot/failed.txt") -and (Get-Date) -lt $deadline){Start-Sleep -Milliseconds 250}
+ if(Test-Path "$rollbackRoot/failed.txt"){throw (Get-Content "$rollbackRoot/failed.txt" -Raw)}
+ if(!(Test-Path "$rollbackRoot/restarted.txt") -or (Get-Content "$rollbackRoot/restarted.txt" -Raw) -ne '1.0.0|1.0.0.0'){throw "Rollback/restart did not complete: $rollbackRoot"}
+ Write-Output 'PASS real portable rollback 1.0.1 -> 1.0.0 with shared production backend and restart'
+ $badRollback=Join-Path $testRoot 'rollback-corrupt'
+ New-Item -ItemType Directory -Force "$badRollback/feed" | Out-Null
+ Copy-Item "$testRoot/baseline/*" "$badRollback/feed/"
+ $package=Get-ChildItem "$badRollback/feed" -Filter '*-full.nupkg' | Select-Object -First 1
+ $bytes=[IO.File]::ReadAllBytes($package.FullName)
+ $bytes[100]=$bytes[100] -bxor 255
+ [IO.File]::WriteAllBytes($package.FullName,$bytes)
+ Expand-Archive -LiteralPath "$testRoot/feed/LevelingUpdateTest-win-Portable.zip" -DestinationPath "$badRollback/installed"
+ $env:LEVELING_UPDATE_TEST_ROOT=$badRollback
+ $exe=Get-ChildItem "$badRollback/installed" -Filter UpdateLifecycle.exe -Recurse | Select-Object -First 1
+ $process=Start-Process -FilePath $exe.FullName -WindowStyle Hidden -PassThru
+ if(!$process.WaitForExit(60000)){throw 'Corrupt rollback check timed out'}
+ if(!(Test-Path "$badRollback/failed.txt") -or (Test-Path "$badRollback/restarted.txt") -or (Test-Path "$badRollback/downloaded.txt")){throw 'Corrupt rollback package was not rejected'}
+ if((Get-Content "$badRollback/failed.txt" -Raw) -notmatch 'Checksum|checksum|SHA256|hash'){throw 'Unexpected rollback rejection'}
+ Write-Output 'PASS corrupted rollback package rejected by production backend before installation'
+} finally {Remove-Item Env:LEVELING_UPDATE_TEST_ROOT -ErrorAction SilentlyContinue; Remove-Item Env:LEVELING_UPDATE_TEST_ROLLBACK -ErrorAction SilentlyContinue; Pop-Location}

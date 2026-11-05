@@ -406,13 +406,13 @@ namespace Multiverse.Services
 
                 if (decoder is null || !decoder.Running)
                 {
-                    startupStage = "Abertura do NVDEC";
+                    startupStage = "Abertura do decoder de vídeo";
                     decoder = new NativeNvdecPlayer(
                         config.Width,
                         config.Height,
                         () => _ = _session.RequestRemoteIdrAsync());
                     createdDecoder = true;
-                    startupStage = "Inicialização do NVDEC";
+                    startupStage = "Inicialização do decoder de vídeo";
                     decoder.Start();
                 }
 

@@ -17,6 +17,9 @@ namespace Multiverse.Views
         private readonly RemoteSessionService _session = RemoteSessionService.Instance;
         private RemoteStreamingRuntime Stream => RemoteStreamingRuntime.Instance;
         private bool _refreshing;
+        private bool _friendMenuOpen;
+        private bool _presenceRenderPending;
+        private bool _loaded;
 
         public FriendsPage()
         {
@@ -28,6 +31,7 @@ namespace Multiverse.Views
 
         private async void OnLoaded(object sender, RoutedEventArgs e)
         {
+            _loaded = true;
             FriendRequestPromptCoordinator.Instance.Attach(this);
             _store.FriendsChanged += Store_FriendsChanged;
             _presence.PresenceChanged += Presence_PresenceChanged;
@@ -39,6 +43,9 @@ namespace Multiverse.Views
 
         private void OnUnloaded(object sender, RoutedEventArgs e)
         {
+            _loaded = false;
+            _friendMenuOpen = false;
+            _presenceRenderPending = false;
             FriendRequestPromptCoordinator.Instance.Detach(this);
             _store.FriendsChanged -= Store_FriendsChanged;
             _presence.PresenceChanged -= Presence_PresenceChanged;
@@ -80,8 +87,23 @@ namespace Multiverse.Views
             }
         }
 
+        private void FriendMenu_Opening(object sender, object e) => _friendMenuOpen = true;
+
+        private void FriendMenu_Closed(object sender, object e)
+        {
+            _friendMenuOpen = false;
+            if (!_presenceRenderPending || !_loaded) return;
+            _presenceRenderPending = false;
+            // Let the menu command finish using its original DataContext first.
+            DispatcherQueue.TryEnqueue(RenderCurrentPresence);
+        }
+
         private void RenderCurrentPresence()
         {
+            if (!_loaded) return;
+            // Replacing ItemsSource destroys the button that owns the open flyout.
+            // Coalesce presence updates until the user finishes the menu interaction.
+            if (_friendMenuOpen) { _presenceRenderPending = true; return; }
             FriendPresenceSnapshot snapshot = _presence.GetSnapshot();
             FriendsStatusTextBlock.Text = snapshot.Status;
             var pending = _session.GetPendingFriendRequests().ToArray();

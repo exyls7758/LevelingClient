@@ -1168,7 +1168,7 @@ namespace Multiverse.Services
                     {
                         Status = result,
                         Error =
-                            $"Falha ao criar NVDEC ({result})."
+                            $"Não foi possível iniciar o decoder de vídeo ({result}). Verifique o driver gráfico e os componentes de mídia do Windows."
                     };
                 }
 

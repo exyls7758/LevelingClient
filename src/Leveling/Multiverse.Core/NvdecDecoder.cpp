@@ -1,4 +1,5 @@
 #include "MultiverseCore.h"
+#include "MfVideoDecoder.h"
 #include "D3D11NvdecRenderer.h"
 
 #include <Windows.h>
@@ -2062,414 +2063,61 @@ MV_NvdecRuntimeLibraryAvailable()
 #endif
 }
 
-std::int32_t __cdecl MV_DecoderCreate(
-    std::uint32_t expectedWidth,
-    std::uint32_t expectedHeight,
-    std::uint32_t previewMaxWidth,
-    void** decoderHandle)
-{
-    if (!decoderHandle)
-        return -20020;
-
-    *decoderHandle =
-        nullptr;
-
+namespace {
+struct DecoderHandle {
 #if defined(MULTIVERSE_NVDEC)
-    try
-    {
-        auto decoder =
-            std::make_unique<
-                NativeNvdecDecoder>(
-                    expectedWidth,
-                    expectedHeight,
-                    previewMaxWidth);
-
-        std::int32_t result =
-            decoder->Initialize();
-
-        if (result < 0)
-            return result;
-
-        *decoderHandle =
-            decoder.release();
-
-        return 0;
-    }
-    catch (...)
-    {
-        return -20021;
-    }
-#else
-    (void)expectedWidth;
-    (void)expectedHeight;
-    (void)previewMaxWidth;
-
-    return -20022;
+    std::unique_ptr<NativeNvdecDecoder> nvdec;
 #endif
-}
-
-void __cdecl MV_DecoderDestroy(
-    void* decoderHandle)
-{
+    std::unique_ptr<MfVideoDecoder> windows;
+};
+template<class Action> int32_t WithDecoder(void* opaque, Action action) {
+    auto* handle=static_cast<DecoderHandle*>(opaque);
+    if(!handle)return -20023;
+    try {
 #if defined(MULTIVERSE_NVDEC)
-    delete static_cast<
-        NativeNvdecDecoder*>(
-            decoderHandle);
-#else
-    (void)decoderHandle;
+        if(handle->nvdec)return action(*handle->nvdec);
 #endif
+        if(handle->windows)return action(*handle->windows);
+    } catch(...) { return -20021; }
+    return -20023;
 }
-
-std::int32_t __cdecl
-MV_DecoderPushAnnexB(
-    void* decoderHandle,
-    const std::uint8_t* data,
-    std::uint32_t bytes,
-    std::uint64_t frameId,
-    std::int32_t keyFrame)
-{
+}
+int32_t __cdecl MV_DecoderCreate(uint32_t width,uint32_t height,uint32_t preview,void** output) {
+    if(!output)return -20020;
+    *output=nullptr;
+    try {
+        auto handle=std::make_unique<DecoderHandle>();
+        wchar_t mode[32]{};
+        GetEnvironmentVariableW(L"LEVELING_DECODER",mode,32);
+        bool forceMf=_wcsicmp(mode,L"mf")==0||_wcsicmp(mode,L"mf-software")==0;
 #if defined(MULTIVERSE_NVDEC)
-    auto* decoder =
-        static_cast<
-            NativeNvdecDecoder*>(
-                decoderHandle);
-
-    if (!decoder)
-        return -20023;
-
-    return decoder->Push(
-        data,
-        bytes,
-        frameId,
-        keyFrame != 0);
-#else
-    (void)decoderHandle;
-    (void)data;
-    (void)bytes;
-    (void)frameId;
-    (void)keyFrame;
-
-    return -20022;
+        // Preserve the established NVIDIA path. Windows decoding is a fallback,
+        // or explicitly selected by the diagnostic harness.
+        if(!forceMf&&MV_NvdecRuntimeLibraryAvailable()) {
+            auto candidate=std::make_unique<NativeNvdecDecoder>(width,height,preview);
+            if(candidate->Initialize()>=0)handle->nvdec=std::move(candidate);
+        }
+        if(!handle->nvdec)
 #endif
+        {
+            handle->windows=std::make_unique<MfVideoDecoder>(width,height,_wcsicmp(mode,L"mf-software")==0);
+            auto result=handle->windows->Initialize();
+            if(result<0)return result;
+        }
+        *output=handle.release();return 0;
+    } catch(...) {return -20021;}
 }
-
-std::int32_t __cdecl
-MV_DecoderGetStats(
-    void* decoderHandle,
-    MV_DecoderStats* stats)
-{
-    if (!stats)
-        return -20024;
-
-#if defined(MULTIVERSE_NVDEC)
-    auto* decoder =
-        static_cast<
-            NativeNvdecDecoder*>(
-                decoderHandle);
-
-    if (!decoder)
-        return -20023;
-
-    decoder->FillStats(
-        *stats);
-
-    return 0;
-#else
-    (void)decoderHandle;
-    *stats = {};
-    return -20022;
-#endif
-}
-
-std::int32_t __cdecl
-MV_DecoderSignalDiscontinuity(
-    void* decoderHandle)
-{
-#if defined(MULTIVERSE_NVDEC)
-    auto* decoder =
-        static_cast<
-            NativeNvdecDecoder*>(
-                decoderHandle);
-
-    if (!decoder)
-        return -20023;
-
-    decoder->SignalDiscontinuity();
-    return 0;
-#else
-    (void)decoderHandle;
-    return -20022;
-#endif
-}
-
-std::int32_t __cdecl
-MV_DecoderSetHeadlessOutput(
-    void* decoderHandle,
-    std::int32_t enabled)
-{
-#if defined(MULTIVERSE_NVDEC)
-    auto* decoder =
-        static_cast<
-            NativeNvdecDecoder*>(
-                decoderHandle);
-
-    if (!decoder)
-        return -20023;
-
-    decoder->SetHeadlessOutput(
-        enabled != 0);
-
-    return 0;
-#else
-    (void)decoderHandle;
-    (void)enabled;
-    return -20022;
-#endif
-}
-
-std::int32_t __cdecl
-MV_DecoderAttachSwapChainPanel(
-    void* decoderHandle,
-    void* panelUnknown,
-    std::uint32_t width,
-    std::uint32_t height)
-{
-#if defined(MULTIVERSE_NVDEC)
-    auto* decoder =
-        static_cast<
-            NativeNvdecDecoder*>(
-                decoderHandle);
-
-    if (!decoder ||
-        !panelUnknown)
-    {
-        return -20100;
-    }
-
-    return decoder->
-        AttachSwapChainPanel(
-            static_cast<IUnknown*>(
-                panelUnknown),
-            width,
-            height);
-#else
-    (void)decoderHandle;
-    (void)panelUnknown;
-    (void)width;
-    (void)height;
-    return -20022;
-#endif
-}
-
-std::int32_t __cdecl
-MV_DecoderResizeSwapChain(
-    void* decoderHandle,
-    std::uint32_t width,
-    std::uint32_t height)
-{
-#if defined(MULTIVERSE_NVDEC)
-    auto* decoder =
-        static_cast<
-            NativeNvdecDecoder*>(
-                decoderHandle);
-
-    return decoder
-        ? decoder->ResizeSwapChain(
-            width,
-            height)
-        : -20100;
-#else
-    (void)decoderHandle;
-    (void)width;
-    (void)height;
-    return -20022;
-#endif
-}
-
-std::int32_t __cdecl
-MV_DecoderSetCompositionScale(
-    void* decoderHandle, float scaleX, float scaleY)
-{
-#if defined(MULTIVERSE_NVDEC)
-    auto* decoder = static_cast<NativeNvdecDecoder*>(decoderHandle);
-    return decoder ? decoder->SetCompositionScale(scaleX, scaleY) : -20100;
-#else
-    (void)decoderHandle;
-    (void)scaleX;
-    (void)scaleY;
-    return -20022;
-#endif
-}
-
-std::int32_t __cdecl MV_DecoderTryDetachPanel(void* decoderHandle)
-{
-#if defined(MULTIVERSE_NVDEC)
-    auto* decoder = static_cast<NativeNvdecDecoder*>(decoderHandle);
-    return decoder ? decoder->TryDetachPanel() : 0;
-#else
-    (void)decoderHandle;
-    return 0;
-#endif
-}
-
-void __cdecl
-MV_DecoderDetachSwapChainPanel(
-    void* decoderHandle)
-{
-#if defined(MULTIVERSE_NVDEC)
-    auto* decoder =
-        static_cast<
-            NativeNvdecDecoder*>(
-                decoderHandle);
-
-    if (decoder)
-    {
-        decoder->
-            DetachSwapChainPanel();
-    }
-#else
-    (void)decoderHandle;
-#endif
-}
-
-std::int32_t __cdecl
-MV_DecoderGetD3D11RendererStats(
-    void* decoderHandle,
-    MV_D3D11RendererStats* stats)
-{
-    if (!stats)
-        return -20101;
-
-#if defined(MULTIVERSE_NVDEC)
-    auto* decoder =
-        static_cast<
-            NativeNvdecDecoder*>(
-                decoderHandle);
-
-    if (!decoder)
-        return -20100;
-
-    decoder->
-        FillRendererStats(
-            *stats);
-
-    return 0;
-#else
-    (void)decoderHandle;
-    *stats = {};
-    return -20022;
-#endif
-}
-
-std::int32_t __cdecl
-MV_DecoderGetPreviewSize(
-    void* decoderHandle,
-    std::uint32_t* width,
-    std::uint32_t* height,
-    std::uint32_t* stride,
-    std::uint32_t* requiredBytes)
-{
-    if (!width ||
-        !height ||
-        !stride ||
-        !requiredBytes)
-    {
-        return -20024;
-    }
-
-#if defined(MULTIVERSE_NVDEC)
-    auto* decoder =
-        static_cast<
-            NativeNvdecDecoder*>(
-                decoderHandle);
-
-    if (!decoder)
-        return -20023;
-
-    decoder->GetPreviewInfo(
-        *width,
-        *height,
-        *stride,
-        *requiredBytes);
-
-    return 0;
-#else
-    (void)decoderHandle;
-    *width = 0;
-    *height = 0;
-    *stride = 0;
-    *requiredBytes = 0;
-    return -20022;
-#endif
-}
-
-std::int32_t __cdecl
-MV_DecoderCopyLatestPreview(
-    void* decoderHandle,
-    std::uint8_t* destination,
-    std::uint32_t destinationBytes,
-    std::uint64_t* previewFrameId)
-{
-    if (!previewFrameId)
-        return -20024;
-
-#if defined(MULTIVERSE_NVDEC)
-    auto* decoder =
-        static_cast<
-            NativeNvdecDecoder*>(
-                decoderHandle);
-
-    if (!decoder)
-        return -20023;
-
-    return decoder->CopyPreview(
-        destination,
-        destinationBytes,
-        *previewFrameId);
-#else
-    (void)decoderHandle;
-    (void)destination;
-    (void)destinationBytes;
-    *previewFrameId = 0;
-    return -20022;
-#endif
-}
-
-std::int32_t __cdecl
-MV_DecoderGetLastMessage(
-    void* decoderHandle,
-    wchar_t* destination,
-    std::uint32_t destinationChars)
-{
-    if (!destination ||
-        destinationChars == 0)
-    {
-        return -20024;
-    }
-
-#if defined(MULTIVERSE_NVDEC)
-    auto* decoder =
-        static_cast<
-            NativeNvdecDecoder*>(
-                decoderHandle);
-
-    if (!decoder)
-        return -20023;
-
-    decoder->CopyMessage(
-        destination,
-        destinationChars);
-
-    return 0;
-#else
-    (void)decoderHandle;
-
-    wcsncpy_s(
-        destination,
-        destinationChars,
-        L"Core compilado sem NVDEC.",
-        _TRUNCATE);
-
-    return -20022;
-#endif
-}
+void __cdecl MV_DecoderDestroy(void* h){delete static_cast<DecoderHandle*>(h);}
+int32_t __cdecl MV_DecoderPushAnnexB(void* h,const uint8_t* data,uint32_t bytes,uint64_t id,int32_t key){return WithDecoder(h,[&](auto& d){return d.Push(data,bytes,id,key!=0);});}
+int32_t __cdecl MV_DecoderGetStats(void* h,MV_DecoderStats* stats){if(!stats)return -20024;return WithDecoder(h,[&](auto& d){d.FillStats(*stats);return 0;});}
+int32_t __cdecl MV_DecoderSignalDiscontinuity(void* h){return WithDecoder(h,[](auto& d){d.SignalDiscontinuity();return 0;});}
+int32_t __cdecl MV_DecoderSetHeadlessOutput(void* h,int32_t enabled){return WithDecoder(h,[&](auto& d){d.SetHeadlessOutput(enabled!=0);return 0;});}
+int32_t __cdecl MV_DecoderAttachSwapChainPanel(void* h,void* panel,uint32_t w,uint32_t height){if(!panel)return -20100;return WithDecoder(h,[&](auto& d){return d.AttachSwapChainPanel(static_cast<IUnknown*>(panel),w,height);});}
+int32_t __cdecl MV_DecoderResizeSwapChain(void* h,uint32_t w,uint32_t height){return WithDecoder(h,[&](auto& d){return d.ResizeSwapChain(w,height);});}
+int32_t __cdecl MV_DecoderSetCompositionScale(void* h,float x,float y){return WithDecoder(h,[&](auto& d){return d.SetCompositionScale(x,y);});}
+int32_t __cdecl MV_DecoderTryDetachPanel(void* h){if(!h)return 0;return WithDecoder(h,[](auto& d){return d.TryDetachPanel();});}
+void __cdecl MV_DecoderDetachSwapChainPanel(void* h){WithDecoder(h,[](auto& d){d.DetachSwapChainPanel();return 0;});}
+int32_t __cdecl MV_DecoderGetD3D11RendererStats(void* h,MV_D3D11RendererStats* stats){if(!stats)return -20101;return WithDecoder(h,[&](auto& d){d.FillRendererStats(*stats);return 0;});}
+int32_t __cdecl MV_DecoderGetPreviewSize(void* h,uint32_t* w,uint32_t* height,uint32_t* stride,uint32_t* bytes){if(!w||!height||!stride||!bytes)return -20024;return WithDecoder(h,[&](auto& d){d.GetPreviewInfo(*w,*height,*stride,*bytes);return 0;});}
+int32_t __cdecl MV_DecoderCopyLatestPreview(void* h,uint8_t* data,uint32_t bytes,uint64_t* id){if(!id)return -20024;return WithDecoder(h,[&](auto& d){return d.CopyPreview(data,bytes,*id);});}
+int32_t __cdecl MV_DecoderGetLastMessage(void* h,wchar_t* destination,uint32_t chars){if(!destination||!chars)return -20024;return WithDecoder(h,[&](auto& d){d.CopyMessage(destination,chars);return 0;});}

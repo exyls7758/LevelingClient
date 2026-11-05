@@ -38,6 +38,10 @@ internal static class VideoLocalSelfTest
                 motionSource = new Window { Title="Leveling • Movimento do teste local", Content=tile };
                 motionSource.Activate();
                 motionSource.AppWindow.MoveAndResize(new Windows.Graphics.RectInt32(20,20,420,180));
+                // Keep the motion visible above the receiver window. Occluded
+                // compositor animations can be throttled, invalidating FPS comparisons.
+                if (motionSource.AppWindow.Presenter is Microsoft.UI.Windowing.OverlappedPresenter motionPresenter)
+                    motionPresenter.IsAlwaysOnTop = true;
                 var visual=Microsoft.UI.Xaml.Hosting.ElementCompositionPreview.GetElementVisual(tile);
                 var animation=visual.Compositor.CreateVector3KeyFrameAnimation();
                 animation.InsertKeyFrame(0,Vector3.Zero); animation.InsertKeyFrame(.5f,new Vector3(300,0,0)); animation.InsertKeyFrame(1,Vector3.Zero);
@@ -103,7 +107,7 @@ internal static class VideoLocalSelfTest
                 throw new InvalidOperationException("Capture/encoder/UDP did not produce real traffic");
             if (!window.IsOpen || !final.D3D11Attached || final.DecodedPictures < 30 || final.D3D11PresentedFrames < firstPresented + 30)
                 throw new InvalidOperationException("No sustained decoded/presented video (packet delivery alone is not PASS)");
-            Log("PASS WGC -> NVENC -> UDP loopback -> NVDEC -> D3D11 window; WAN and input latency not tested");
+            Log("PASS WGC -> NVENC -> UDP loopback -> decoder -> D3D11 window; WAN and input latency not tested; backend=" + final.LastError);
             exit = 0;
         }
         catch (Exception ex) { Log("FAIL " + ex); }

@@ -173,6 +173,7 @@
 
   <ItemGroup>
     <ClInclude Include="MultiverseCore.h" />
+    <ClInclude Include="MfVideoDecoder.h" />
     <ClInclude Include="Core10SharedFrameRing.h" />
     <ClInclude Include="Core10WgcCapture.h" />
     <ClInclude Include="Core11AdaptivePressureController.h" />
@@ -190,6 +191,7 @@
     <ClCompile Include="Core10SharedFrameRing.cpp" />
     <ClCompile Include="Core10WgcCapture.cpp" />
     <ClCompile Include="NvdecDecoder.cpp" />
+    <ClCompile Include="MfVideoDecoder.cpp" />
     <ClCompile Include="D3D11NvdecRenderer.cpp" />
   </ItemGroup>
 

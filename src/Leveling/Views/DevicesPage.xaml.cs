@@ -2928,7 +2928,7 @@ namespace Multiverse.Views
         {
             if (!ManualPipelineAvailable())
                 throw new InvalidOperationException("A transmissão principal está usando o pipeline.");
-            EnsureNvdecAvailable();
+            // Decoder creation negotiates NVIDIA or Windows H.264.
 
             if (_capture is null)
                 return;
@@ -3071,7 +3071,7 @@ namespace Multiverse.Views
 
             try
             {
-                EnsureNvdecAvailable();
+                // Decoder creation negotiates NVIDIA or Windows H.264.
 
                 bool running =
                     await _streamRuntime.EnsureClientStreamingAsync();
@@ -3126,22 +3126,6 @@ namespace Multiverse.Views
                     $"Falha no cliente remoto: {ex.Message}";
 
                 UpdateRemoteModeUi();
-            }
-        }
-
-        private void EnsureNvdecAvailable()
-        {
-            if (!NativeCoreService.NvdecCompiled)
-            {
-                throw new InvalidOperationException(
-                    "Leveling Core foi compilado sem NVDEC. " +
-                    "Confira CUDA_PATH + NV_CODEC_SDK e recompile.");
-            }
-
-            if (!NativeCoreService.NvdecRuntimeAvailable)
-            {
-                throw new InvalidOperationException(
-                    "nvcuda.dll/nvcuvid.dll não estão disponíveis no driver.");
             }
         }
 

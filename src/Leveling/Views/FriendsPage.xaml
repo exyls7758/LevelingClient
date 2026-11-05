@@ -122,7 +122,7 @@
                                         </StackPanel>
                                         <Button ui:InterfaceMotion.Enabled="True" Grid.Column="2" Content="⋯" Style="{StaticResource Ghost}" MinWidth="42" Padding="10,6" DataContext="{Binding}" ToolTipService.ToolTip="Permissões do amigo">
                                             <Button.Flyout>
-                                                <MenuFlyout>
+                                                <MenuFlyout Opening="FriendMenu_Opening" Closed="FriendMenu_Closed">
                                                     <ToggleMenuFlyoutItem Text="Permitir entrada direta" IsChecked="{Binding AllowDirectConnection}" DataContext="{Binding}" Click="DirectPermission_Click"/>
                                                     <ToggleMenuFlyoutItem Text="Aceitar automaticamente" IsChecked="{Binding AutoAcceptConnection}" IsEnabled="{Binding AllowDirectConnection}" DataContext="{Binding}" Click="AutoAcceptPermission_Click"/>
                                                     <ToggleMenuFlyoutItem Text="Permitir controle remoto" IsChecked="{Binding AllowRemoteInput}" DataContext="{Binding}" Click="InputPermission_Click"/>

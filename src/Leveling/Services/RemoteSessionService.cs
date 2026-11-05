@@ -68,6 +68,7 @@ namespace Multiverse.Services
         public string LocalCode { get; init; } = "";
         public string LocalName { get; init; } = "";
         public string LocalDirectAddress { get; init; } = "";
+        public string ConnectionPath { get; init; } = "Sem sessão";
         public string CurrentTailscaleIp { get; init; } = "";
         public string TailscaleInterface { get; init; } = "";
         public long NetworkGeneration { get; init; }
@@ -1469,7 +1470,7 @@ namespace Multiverse.Services
 
         public async Task<RemoteConnectResult>
             ConnectAsync(
-                string target)
+                string target, ConnectionPath path = ConnectionPath.Existing)
         {
             Start();
 
@@ -1493,9 +1494,11 @@ namespace Multiverse.Services
                 resolved =
                     await ResolveTargetAsync(
                         target);
+                ConnectionPathPolicy.Validate(path, resolved.Address);
             }
             catch (Exception ex)
             {
+                VideoIncidentRecorder.Instance.RecordEvent("CONNECTION_PATH_REJECTED", new { mode = (int)path, ex.HResult });
                 return new RemoteConnectResult
                 {
                     Success = false,
@@ -1514,6 +1517,7 @@ namespace Multiverse.Services
 
             try
             {
+                VideoIncidentRecorder.Instance.RecordEvent("CONNECTION_ATTEMPT", new { mode = (int)path, tailscaleAddress = ConnectionPathPolicy.IsTailscale(resolved.Address), privateAddress = ConnectionPathPolicy.IsPrivateLan(resolved.Address) });
                 using CancellationTokenSource timeout =
                     new(
                         TimeSpan.FromSeconds(6));
@@ -1522,6 +1526,7 @@ namespace Multiverse.Services
                     resolved.Address,
                     resolved.ControlPort,
                     timeout.Token);
+                VideoIncidentRecorder.Instance.RecordEvent("CONNECTION_CONTROL_REACHED", new { mode = (int)path });
 
                 NetworkStream stream =
                     client.GetStream();
@@ -1636,6 +1641,7 @@ namespace Multiverse.Services
                             remoteUdpPort));
 
                 SavePeerProfile(reply.SourceCode, reply.SourceName);
+                VideoIncidentRecorder.Instance.RecordEvent("CONNECTION_SESSION_ACCEPTED", new { mode = (int)path, sessionGeneration = generation });
 
                 CancellationToken sessionToken =
                     _sessionCancel!.Token;
@@ -1663,6 +1669,8 @@ namespace Multiverse.Services
             {
                 client.Dispose();
 
+                VideoIncidentRecorder.Instance.RecordEvent("CONNECTION_TIMEOUT", new { mode = (int)path });
+
                 return new RemoteConnectResult
                 {
                     Success = false,
@@ -1673,6 +1681,7 @@ namespace Multiverse.Services
             catch (SocketException ex)
             {
                 client.Dispose();
+                VideoIncidentRecorder.Instance.RecordEvent("CONNECTION_SOCKET_ERROR", new { mode = (int)path, socketError = (int)ex.SocketErrorCode });
 
                 return new RemoteConnectResult
                 {
@@ -3237,6 +3246,7 @@ namespace Multiverse.Services
 
                     LocalDirectAddress =
                         BuildLocalDirectAddress(),
+                    ConnectionPath = connected ? ConnectionPathPolicy.Describe(_remoteVideoEndpoint?.Address) : "Sem sessão",
 
                     CurrentTailscaleIp =
                         _tailscale.GetSnapshot().CurrentTailscaleIp,
@@ -4024,7 +4034,13 @@ namespace Multiverse.Services
                 _settings.Set("Multiverse.Peer.Name", name.Trim());
         }
 
-        private static IPAddress? GetBestLocalIpv4()
+        public string GetLocalLanAddress()
+        {
+            var address = GetBestLocalIpv4(lanOnly: true);
+            return address is null ? "Nenhum IPv4 local disponível." : $"{address}:{ControlPort}#{NormalizeCode(DeviceCode)}";
+        }
+
+        private static IPAddress? GetBestLocalIpv4(bool lanOnly = false)
         {
             IPAddress? best = null;
             int bestScore = int.MinValue;
@@ -4050,6 +4066,8 @@ namespace Multiverse.Services
                 {
                     IPAddress address =
                         unicast.Address;
+
+                    if (lanOnly && !ConnectionPathPolicy.IsPrivateLan(address)) continue;
 
                     if (
                         address.AddressFamily !=

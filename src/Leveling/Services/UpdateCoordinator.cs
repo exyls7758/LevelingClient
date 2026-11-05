@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
@@ -7,6 +8,8 @@ public record ReleaseOffer(string Version, string Notes, long Size);
 public interface IUpdateBackend {
     bool Available { get; }
     Task<ReleaseOffer?> CheckAsync();
+    Task<IReadOnlyList<ReleaseOffer>> GetPreviousAsync();
+    Task<ReleaseOffer> SelectPreviousAsync(string version);
     Task DownloadAsync(Action<int> progress, CancellationToken token);
     void Apply();
 }
@@ -23,6 +26,8 @@ public sealed class UpdateCoordinator {
     public int Percent { get; private set; }
     public double BytesPerSecond { get; private set; }
     public bool Deferred { get; private set; }
+    public bool IsRollback { get; private set; }
+    public IReadOnlyList<ReleaseOffer> Previous { get; private set; } = Array.Empty<ReleaseOffer>();
     public UpdateCoordinator(IUpdateBackend backend, Func<bool> sessionBusy) { this.backend=backend; this.sessionBusy=sessionBusy; }
     void Notify() => Changed?.Invoke();
     public void Later() { Deferred=true; Notify(); }
@@ -31,22 +36,47 @@ public sealed class UpdateCoordinator {
         try {
             Busy=true; Status="Verificando atualizações…"; Notify();
             if (!backend.Available) { Status="Esta cópia não tem o instalador de atualizações. Use a distribuição Setup ou Portable oficial."; return; }
-            if (Ready) { Status="Atualização baixada. Pronta para instalar."; return; }
+            if (Ready && !IsRollback) { Status="Atualização baixada. Pronta para instalar."; return; }
+            var oldVersion=Offer?.Version;
+            Offer=null; Ready=false; IsRollback=false; Percent=0;
             var next=await backend.CheckAsync();
-            if (next?.Version != Offer?.Version) Deferred=false;
+            if (next?.Version != oldVersion) Deferred=false;
             Offer=next;
             Status=next is null ? "Você está na versão mais recente." : "Nova atualização disponível!";
         } catch (Exception) { Status="Não foi possível verificar agora. Confira a conexão e tente novamente."; }
         finally { Busy=false; gate.Release(); Notify(); }
     }
+    public async Task LoadPreviousAsync() {
+        if (!await gate.WaitAsync(0)) return;
+        try {
+            Busy=true; Notify();
+            if (!backend.Available) { Status="Use a distribuição Setup ou Portable oficial para restaurar versões."; return; }
+            Status="Buscando versões anteriores…"; Notify();
+            Previous=await backend.GetPreviousAsync();
+            Status=Previous.Count==0 ? "Nenhuma versão anterior compatível disponível." : "Escolha a versão que funcionava melhor neste PC.";
+        } catch (Exception) { Previous=Array.Empty<ReleaseOffer>(); Status="Não foi possível consultar as versões anteriores. Tente novamente."; }
+        finally { Busy=false; gate.Release(); Notify(); }
+    }
+    public async Task<bool> SelectPreviousAsync(string version) {
+        if (!await gate.WaitAsync(0)) return false;
+        try {
+            if (!backend.Available || sessionBusy()) { Status="Encerre a sessão e a transmissão antes de restaurar."; return false; }
+            Busy=true; Offer=null; Ready=false; IsRollback=false; Percent=0; BytesPerSecond=0; Notify();
+            Offer=await backend.SelectPreviousAsync(version);
+            IsRollback=true; Deferred=true;
+            Status="Versão anterior selecionada. Confirme para baixar, restaurar e reiniciar.";
+            return true;
+        } catch (Exception) { Status="Esta versão não está disponível para restauração. Consulte a lista novamente."; return false; }
+        finally { Busy=false; gate.Release(); Notify(); }
+    }
     public async Task UpdateAsync(CancellationToken token=default) {
         if (!await gate.WaitAsync(0)) return;
         try {
-            if (Offer is null) return;
+            if (Offer is null || !backend.Available) return;
             if (sessionBusy()) { Status="Encerre a sessão e a transmissão antes de atualizar. Nada foi interrompido."; return; }
             Busy=true; Deferred=false; Notify();
             if (!Ready) {
-                Percent=0; Status="Baixando atualização…"; var elapsed=Stopwatch.StartNew();
+                Percent=0; Status=IsRollback ? "Baixando versão anterior…" : "Baixando atualização…"; var elapsed=Stopwatch.StartNew();
                 await backend.DownloadAsync(p => {
                     Percent=Math.Clamp(p,0,100);
                     BytesPerSecond=elapsed.Elapsed.TotalSeconds>0 ? Offer.Size*(Percent/100.0)/elapsed.Elapsed.TotalSeconds : 0;

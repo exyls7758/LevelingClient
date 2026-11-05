@@ -146,6 +146,7 @@ namespace Multiverse.Services
                 Add("control.", control);
                 values["transport.endpointHash"] = EndpointHash(transport?.RemoteEndpoint);
                 values["transport.mode"] = VideoFlightRecorder.NormalizeReason(transport?.Mode ?? "UNKNOWN");
+                values["session.connectionPath"] = session.ConnectionPath;
                 values["transport.congestion"] = VideoFlightRecorder.NormalizeReason(transport?.CongestionState ?? "UNKNOWN");
                 values["transport.errorKind"] = ErrorKind(transport?.LastError);
                 values["decoder.errorKind"] = ErrorKind(decoder?.LastError);
