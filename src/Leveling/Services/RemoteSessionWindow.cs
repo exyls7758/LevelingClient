@@ -35,6 +35,7 @@ namespace Multiverse.Services
         private readonly TextBlock _hudText;
         private readonly TextBlock _presentationStatus;
         private readonly PresentationRetry _presentationRetry = new();
+        private readonly PresentationBusyRetry _presentationBusyRetry = new();
         private readonly PresenterRecoveryPolicy _presenterRecovery = new();
         private readonly ClientVideoStatus _videoStatus = new();
         private bool _presentationFailed;
@@ -366,6 +367,7 @@ namespace Multiverse.Services
                 _decoder = decoder;
                 _presenterRecovery.Reset();
                 _presentationRetry.Reset();
+                _presentationBusyRetry.Reset();
                 _presentationFailed = false;
                 _resizeTimer.Interval = TimeSpan.FromMilliseconds(80);
             }
@@ -378,30 +380,22 @@ namespace Multiverse.Services
         {
             if (_disposed)
                 return Task.CompletedTask;
-
-            if (_dispatcher is null || _dispatcher.HasThreadAccess)
+            var expectedDecoder = _decoder;
+            var ui = new UiThreadOperation(
+                () => _dispatcher is null || _dispatcher.HasThreadAccess,
+                action => _dispatcher is not null && _dispatcher.TryEnqueue(() => action()));
+            return SurfaceDetachRetry.RunAsync(async () =>
             {
-                return DetachRendererCore() ? Task.CompletedTask :
-                    Task.FromException(new TimeoutException("A superfície ainda está em uso."));
-            }
-
-            var completion = new TaskCompletionSource<bool>(
-                TaskCreationOptions.RunContinuationsAsynchronously);
-
-            if (!_dispatcher.TryEnqueue(
-                    () =>
-                    {
-                        if (DetachRendererCore()) completion.TrySetResult(true);
-                        else completion.TrySetException(new TimeoutException("A superfície ainda está em uso."));
-                    }))
-            {
-                // If the dispatcher is already gone, the XAML window is being
-                // destroyed and owns release of its panel reference. Native
-                // teardown may continue without calling XAML from this thread.
-                completion.TrySetException(new InvalidOperationException("A janela encerrou antes de confirmar a liberação da superfície."));
-            }
-
-            return completion.Task;
+                bool detached = false;
+                await ui.RunAsync(() =>
+                {
+                    // A delayed retry must never detach a replacement session.
+                    if (_disposed || !ReferenceEquals(expectedDecoder, _decoder))
+                        throw new InvalidOperationException("A janela ou o decoder mudou durante a liberação da superfície.");
+                    detached = DetachRendererCore();
+                });
+                return detached;
+            }, () => Task.Delay(100));
         }
 
         private bool DetachRendererCore()
@@ -693,6 +687,7 @@ namespace Multiverse.Services
                     _rendererAttached = true;
                     _presentationFailed = false;
                     _presentationRetry.Reset();
+                    _presentationBusyRetry.Reset();
                     _presentationStatus.Visibility = Visibility.Collapsed;
                     _lastRenderWidth = width;
                     _lastRenderHeight = height;
@@ -708,11 +703,13 @@ namespace Multiverse.Services
                         _lastRenderWidth = width;
                         _lastRenderHeight = height;
                         _presentationRetry.Reset();
+                        _presentationBusyRetry.Reset();
                         _presentationFailed = false;
                         _presentationStatus.Visibility = Visibility.Collapsed;
                     }
-                    else ReportPresentationFailure("Redimensionamento D3D11", hr);
+                    else { ReportPresentationFailure("Redimensionamento D3D11", hr); return; }
                 }
+                _presentationBusyRetry.Reset();
             }
             catch (Exception ex)
             {
@@ -722,15 +719,19 @@ namespace Multiverse.Services
 
         private void ReportPresentationFailure(string stage, int hr)
         {
+            if (_presentationBusyRetry.TrySchedule(hr, Environment.TickCount64))
+            {
+                // Retain the current frame and retry without blocking the UI or stopping the host.
+                _resizeTimer.Interval = TimeSpan.FromMilliseconds(150);
+                _resizeTimer.Start();
+                return;
+            }
             _presentationFailed = true;
             string reason = $"{stage}: 0x{hr:X8}";
             _presentationStatus.Text = "Não foi possível exibir o vídeo. " + reason +
                 "\nAbra o diagnóstico do cliente para consultar os detalhes.";
             _presentationStatus.Visibility = Visibility.Visible;
             StartupDiagnostics.Stage("CLIENT_PRESENTER_ERROR", reason);
-            var session = _session.GetSnapshot();
-            if (session.StreamConfig is { } config)
-                _ = _session.ReportClientVideoStartupFailureAsync(config.Generation, session.SessionGeneration, reason);
             if (_presentationRetry.TrySchedule())
             {
                 // Repeating Resize on a removed D3D device cannot recover it.
@@ -739,7 +740,11 @@ namespace Multiverse.Services
                 _compositionScaleKnown = false;
                 _resizeTimer.Interval = TimeSpan.FromMilliseconds(500);
                 _resizeTimer.Start();
+                return;
             }
+            var session = _session.GetSnapshot();
+            if (session.StreamConfig is { } config)
+                _ = _session.ReportClientVideoStartupFailureAsync(config.Generation, session.SessionGeneration, reason);
         }
 
         private void Window_Closed(object sender, WindowEventArgs args)

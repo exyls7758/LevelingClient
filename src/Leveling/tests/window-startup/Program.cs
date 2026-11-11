@@ -17,6 +17,22 @@ catch (InvalidOperationException) { Check(true, "closed dispatcher fails explici
 var ui = new UiThreadOperation(() => true, _ => throw new Exception("must not enqueue"));
 await ui.RunAsync(() => invoked = false); Check(!invoked, "UI caller executes without requeue");
 var retry = new PresentationRetry();
+int detachAttempts = 0, detachDelays = 0;
+await SurfaceDetachRetry.RunAsync(() => Task.FromResult(++detachAttempts == 3), () => { detachDelays++; return Task.CompletedTask; });
+Check(detachAttempts == 3 && detachDelays == 2, "surface detach waits asynchronously for temporary ownership contention");
+detachAttempts = 0;
+try { await SurfaceDetachRetry.RunAsync(() => { detachAttempts++; return Task.FromResult(false); }, () => Task.CompletedTask); throw new Exception("detach timeout lost"); }
+catch (TimeoutException) { Check(detachAttempts == 10, "persistent detach contention fails without falsely releasing ownership"); }
+try { await SurfaceDetachRetry.RunAsync(() => throw new InvalidOperationException("window changed"), () => Task.CompletedTask); throw new Exception("detach exception lost"); }
+catch (InvalidOperationException) { Check(true, "dispatcher/session errors are not swallowed by detach retry"); }
+var busy = new PresentationBusyRetry();
+int timeout = unchecked((int)0x80070102);
+Check(busy.TrySchedule(timeout, 100), "busy decoder defers surface operation without failing session");
+Check(busy.TrySchedule(timeout, 1000), "brief contention retains current surface");
+Check(!busy.TrySchedule(timeout, 3100), "persistent contention has a finite deadline");
+Check(!busy.TrySchedule(timeout, 4000), "exhausted busy deadline cannot restart itself");
+busy.Reset(); Check(busy.TrySchedule(timeout, 5000), "successful surface operation resets contention budget");
+Check(!busy.TrySchedule(unchecked((int)0x887A0005), 5100), "device removed is not classified as temporary lock contention");
 Check(retry.TrySchedule() && retry.TrySchedule() && retry.TrySchedule() && !retry.TrySchedule() && !retry.TrySchedule(), "attachment retries bounded to three");
 retry.Reset(); Check(retry.TrySchedule(), "new decoder gets fresh retry budget");
 var status = new ClientVideoStatus();

@@ -483,7 +483,21 @@ namespace Multiverse.Services
                     "stage=" + startupStage + " session=" + session.SessionGeneration +
                     " stream=" + config.Generation);
                 VideoIncidentRecorder.Instance.RecordEvent("CLIENT_STARTUP_ERROR",
-                    new { stage = startupStage, ex.HResult });
+                    new {
+                        // The privacy filter excludes free-form strings. Keep a
+                        // numeric stage and original native status in exported ZIPs.
+                        StageCode = startupStage switch {
+                            "Encerramento do decoder/receptor anterior" => 1,
+                            "Abertura do decoder de vídeo" => 2,
+                            "Inicialização do decoder de vídeo" => 3,
+                            "Abertura do receptor UDP" => 4,
+                            "Bind/inicialização do receptor UDP" => 5,
+                            "Validação da geração da sessão" => 6,
+                            "Publicação de VIDEO READY" => 7,
+                            _ => 0 },
+                        ex.HResult,
+                        NativeStatus = ex.Data["NativeStatus"] is int nativeStatus ? nativeStatus : (int?)null
+                    });
                 VideoIncidentRecorder.Instance.MarkIncident("CLIENT_STARTUP_ERROR", 0);
                 // An allocation/startup exception must not strand a decoder or
                 // receiver that never reached the shared runtime state.

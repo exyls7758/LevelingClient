@@ -46,3 +46,11 @@ O núcleo tenta NVDEC primeiro quando o runtime NVIDIA está disponível. Se ele
 `scripts/Test-VideoCompatibility.ps1` gera H.264 real e verifica saída CPU e texturas GPU, além de retomada após flush. Esse teste exige GPU de vídeo real e deve ser executado localmente. `LEVELING_DECODER=mf` e `mf-software` são seletores de diagnóstico por processo; sem eles, NVIDIA permanece prioritária. O campo reservado 0 das estatísticas do decoder Windows informa a memória de saída observada: 1 CPU, 2 textura DXGI. O campo continua 0 no NVDEC legado.
 
 Os eventos CONNECTION_ATTEMPT, CONNECTION_CONTROL_REACHED, CONNECTION_SESSION_ACCEPTED, CONNECTION_PATH_REJECTED, CONNECTION_TIMEOUT e CONNECTION_SOCKET_ERROR usam mode 0 para fluxo legado, 1 para Tailscale e 2 para local direto. A amostra session.connectionPath classifica o endereço ativo. Tailscale direto versus relay continua exigindo diagnóstico de rota, pois um IP 100.x sozinho não comprova o caminho. Eventos de primeiro quadro e contadores de UDP/decoder/apresentação existentes continuam sendo a evidência de progresso de vídeo.
+
+## Recuperação e implantação na RC9
+
+O timeout 0x80070102 do acesso sincronizado ao decoder é tratado como contenção temporária durante operações de superfície: nova tentativa pelo DispatcherTimer, mantendo a janela e a sessão, com prazo de três segundos. Após esse prazo, permanece o orçamento limitado de recuperação local; o host recebe falha definitiva somente após seu esgotamento. Device removed não é classificado como contenção temporária. Não foram removidos os limites de espera de acesso ao decoder.
+
+O núcleo Release usa CRT estática (/MT). Test-NativeDeployment.ps1 verifica os imports PE da DLL e rejeita runtime VC++ externo ou imports obrigatórios dos drivers NVIDIA. Os drivers NVIDIA continuam opcionais para o receptor Windows; isso não adiciona encoder Intel ao host.
+
+A liberação assíncrona da superfície também tem orçamento finito (dez tentativas, intervalo de 100 ms) e verifica a identidade do decoder antes de cada tentativa. Falha persistente não é convertida em liberação bem-sucedida.

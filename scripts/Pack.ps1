@@ -5,6 +5,7 @@ try {
  [xml]$p=Get-Content src/Leveling/Leveling.csproj
  $version=$p.Project.PropertyGroup.Version | Where-Object {$_} | Select-Object -First 1
  if(!(Test-Path "$PublishDirectory/Leveling.exe") -or !(Test-Path "$PublishDirectory/Multiverse.Core.dll")){throw 'Incomplete publish'}
+ & "$PSScriptRoot/Test-NativeDeployment.ps1" -Path "$PublishDirectory/Multiverse.Core.dll"
  $nativeExpected=(Get-Content native/manifest.json -Raw | ConvertFrom-Json).binary
  if((Get-FileHash "$PublishDirectory/Multiverse.Core.dll").Hash -ne $nativeExpected){throw 'Published native mismatch'}
  $vpk=Join-Path $PWD '.tools/vpk.exe'

@@ -162,10 +162,12 @@ namespace Multiverse.Services
             if (!open.Success ||
                 open.Session is null)
             {
-                throw new InvalidOperationException(
+                var failure = new InvalidOperationException(
                     open.Error.Length > 0
                         ? open.Error
-                        : $"Falha NVDEC ({open.Status}).");
+                        : $"Falha no decoder de vídeo ({open.Status}).");
+                failure.Data["NativeStatus"] = open.Status;
+                throw failure;
             }
 
             _native =
