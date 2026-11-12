@@ -235,7 +235,7 @@ namespace Multiverse.Services
             }
         }
 
-        internal async Task<string> ExportAsync(string? manifestJson = null)
+        internal async Task<string> ExportAsync(string? manifestJson = null, IReadOnlyDictionary<string, string>? attachments = null)
         {
             await _fileGate.WaitAsync().ConfigureAwait(false);
             try
@@ -256,6 +256,13 @@ namespace Multiverse.Services
                 using (var archive = ZipFile.Open(path, ZipArchiveMode.Create))
                 {
                     WriteEntry(archive, "manifest.json", manifestJson ?? "{}");
+                    if (attachments is not null)
+                        foreach (var item in attachments)
+                        {
+                            if (Path.GetFileName(item.Key) != item.Key || item.Key.Contains('\\') || item.Key.Contains('/'))
+                                throw new ArgumentException("Invalid diagnostic attachment name");
+                            WriteEntry(archive, item.Key, item.Value);
+                        }
                     WriteEntry(archive, "recent.jsonl", string.Join("\n", recent));
                     if (current.Length > 0)
                         WriteEntry(archive, "incident_in_progress.jsonl", string.Join("\n", current));

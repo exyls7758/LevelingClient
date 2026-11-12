@@ -12,6 +12,7 @@
     <Compile Include="../../Services/SettingsStoreCore.cs" Link="SettingsStoreCore.cs" />
     <Compile Include="../../Services/RegistrySettingsStore.cs" Link="RegistrySettingsStore.cs" />
     <Compile Include="../../Services/SettingsMigration.cs" Link="SettingsMigration.cs" />
+    <Compile Include="../../Services/ProblemJournal.cs" Link="ProblemJournal.cs" />
     <Compile Include="../../Services/StartupDiagnostics.cs" Link="StartupDiagnostics.cs" />
   </ItemGroup>
 </Project>

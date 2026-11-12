@@ -62,10 +62,14 @@ namespace Multiverse.Views
         {
             if (!ExportDiagnosticsButton.IsEnabled) return;
             ExportDiagnosticsButton.IsEnabled = false;
+            CopySummaryButton.IsEnabled = false;
+            OpenGitHubReportButton.IsEnabled = false;
             ExportStatusText.Text = "Preparando o arquivo de diagnóstico...";
             try
             {
-                string path = await VideoIncidentRecorder.Instance.ExportAsync();
+                string path = await VideoIncidentRecorder.Instance.ExportAsync(ReportCategory.SelectedIndex);
+                CopySummaryButton.IsEnabled = true;
+                OpenGitHubReportButton.IsEnabled = true;
                 ExportStatusText.Text = "Diagnóstico salvo: " + path;
                 try
                 {
@@ -81,6 +85,41 @@ namespace Multiverse.Views
                 ExportStatusText.Text = "Não foi possível exportar: " + ex.Message;
             }
             finally { ExportDiagnosticsButton.IsEnabled = true; }
+        }
+
+        private void CopySummary_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                var data = new Windows.ApplicationModel.DataTransfer.DataPackage();
+                data.SetText(VideoIncidentRecorder.Instance.LastReportSummary);
+                Windows.ApplicationModel.DataTransfer.Clipboard.SetContent(data);
+                ExportStatusText.Text = "Resumo copiado. O ZIP permanece na pasta de diagnósticos.";
+            }
+            catch (Exception ex) { ExportStatusText.Text = "Não foi possível copiar: " + ex.Message; }
+        }
+
+        private async void OpenGitHubReport_Click(object sender, RoutedEventArgs e)
+        {
+            OpenGitHubReportButton.IsEnabled = false;
+            try
+            {
+                string summary = VideoIncidentRecorder.Instance.LastReportSummary;
+                var preview = new ContentDialog {
+                    XamlRoot = XamlRoot, Title = "Revisar resumo público",
+                    Content = new ScrollViewer { MaxHeight = 360,
+                        Content = new TextBlock { Text = summary, IsTextSelectionEnabled = true,
+                            TextWrapping = TextWrapping.Wrap, MaxWidth = 480 } },
+                    PrimaryButtonText = "Abrir rascunho no GitHub", CloseButtonText = "Cancelar"
+                };
+                if (await preview.ShowAsync() != ContentDialogResult.Primary) return;
+                var uri = new Uri("https://github.com/exyls7758/LevelingClient/issues/new?title=" +
+                    Uri.EscapeDataString("Leveling: relato de problema") + "&body=" + Uri.EscapeDataString(summary));
+                bool opened = await Windows.System.Launcher.LaunchUriAsync(uri);
+                ExportStatusText.Text = opened ? "Rascunho aberto. Revise e publique no GitHub se desejar. O ZIP não foi enviado." : "Não foi possível abrir o navegador.";
+            }
+            catch (Exception ex) { ExportStatusText.Text = "Não foi possível abrir o rascunho: " + ex.Message; }
+            finally { OpenGitHubReportButton.IsEnabled = true; }
         }
 
         private void ApplyDiagnosticsLevel()

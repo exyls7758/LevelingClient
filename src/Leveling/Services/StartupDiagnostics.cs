@@ -148,6 +148,7 @@ namespace Multiverse.Services
 
         internal static void RecordException(string category, Exception exception, string? detail = null)
         {
+            ProblemJournal.Instance.Record(category, exception);
             var text = new StringBuilder();
             if (!string.IsNullOrWhiteSpace(detail)) text.AppendLine(detail);
             int depth = 0;

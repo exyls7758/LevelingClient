@@ -232,11 +232,16 @@ static async Task RecorderTests()
         recorder.MarkIncident("CLIENT_FRAME_GAP", 200);
         Interlocked.Add(ref tick, 5000);
         recorder.Collect("{\"kind\":\"after\"}");
-        string active = await recorder.ExportAsync("{\"test\":true}");
+        string active = await recorder.ExportAsync("{\"test\":true}", new Dictionary<string, string> {
+            ["summary.txt"] = "relatório UTF-8: áudio", ["errors.jsonl"] = "{\"HResult\":-1}\n"
+        });
         using (var zip = System.IO.Compression.ZipFile.OpenRead(active))
         {
             Check(zip.GetEntry("incident_in_progress.jsonl") is not null, "export includes active incident");
             Check(zip.GetEntry("recent.jsonl") is not null, "export includes recent history");
+            using var summary = new StreamReader(zip.GetEntry("summary.txt")!.Open());
+            Check(summary.ReadToEnd() == "relatório UTF-8: áudio", "unified ZIP preserves technical summary and accents");
+            Check(zip.GetEntry("errors.jsonl") is not null, "unified ZIP includes durable exception history");
         }
         Interlocked.Add(ref tick, 20000);
         await recorder.FlushAsync();

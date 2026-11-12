@@ -144,6 +144,9 @@ namespace Multiverse.Services
                 Add("decoder.", decoder);
                 Add("progress.", progress);
                 Add("control.", control);
+                // Snapshots only: never start audio/controller hardware for diagnostics.
+                if (RemoteAudioService.IsValueCreated) Add("audio.", RemoteAudioService.Instance.GetSnapshot());
+                if (RemoteGamepadService.IsValueCreated) Add("gamepad.", RemoteGamepadService.Instance.GetSnapshot());
                 values["transport.endpointHash"] = EndpointHash(transport?.RemoteEndpoint);
                 values["transport.mode"] = VideoFlightRecorder.NormalizeReason(transport?.Mode ?? "UNKNOWN");
                 values["session.connectionPath"] = session.ConnectionPath;
@@ -203,17 +206,53 @@ namespace Multiverse.Services
 
         public void MarkIncident(string reason, long durationMs) => _flight.MarkIncident(reason, durationMs);
 
-        public async Task<string> ExportAsync()
+        public string LastReportSummary { get; private set; } = "";
+
+        public async Task<string> ExportAsync(int category = 0)
         {
             var hashes = await _binaryHashes.ConfigureAwait(false);
-            return await _flight.ExportAsync(JsonSerializer.Serialize(new {
-            format = "leveling-video-diagnostics-v2", instance = _instanceId,
+            string[] categories = { "Geral", "Vídeo", "Áudio", "Teclado, mouse e controle", "Conexão", "Travamento ou encerramento" };
+            string selected = categories[Math.Clamp(category, 0, categories.Length - 1)];
+            string reportId = Guid.NewGuid().ToString("N")[..12];
+            var utc = DateTimeOffset.UtcNow;
+            // File I/O and compression stay off the UI thread, even when hashes are cached.
+            return await Task.Run(async () =>
+            {
+            var session = RemoteSessionService.Instance.GetSnapshot();
+            var audio = RemoteAudioService.IsValueCreated ? RemoteAudioService.Instance.GetSnapshot() : null;
+            var gamepad = RemoteGamepadService.IsValueCreated ? RemoteGamepadService.Instance.GetSnapshot() : null;
+            string errors = ProblemJournal.Instance.Read();
+            int errorCount = errors.Count(c => c == '\n');
+            string summary = $"Leveling — relatório {reportId}\nVersão: {BuildInfo.DisplayVersion}\nUTC: {utc:O}\nÁrea: {selected}\n" +
+                $"Sessão conectada: {session.Connected}\nÚltimo incidente: {VideoFlightRecorder.NormalizeReason(LastReason)}\n" +
+                $"Erros registrados (histórico limitado): {errorCount}\n" +
+                "Inclui histórico disponível de vídeo/rede, estados de áudio/controle e metadados de exceções.\n" +
+                "Não inclui mídia, teclas, mensagens de exceção, caminhos pessoais ou códigos de conexão.\n" +
+                "A categoria foi escolhida pelo usuário; este relatório não determina sozinho a causa.\n" +
+                "Para comparar os dois PCs, gere e envie um ZIP em cada computador logo após o problema.";
+            var attachments = new Dictionary<string, string> {
+                ["summary.txt"] = summary,
+                ["errors.jsonl"] = errors,
+                ["report.json"] = JsonSerializer.Serialize(new {
+                    reportId, utc, category = selected, version = BuildInfo.DisplayVersion,
+                    processorCount = Environment.ProcessorCount,
+                    session = Numbers(session), control = Numbers(RemoteSessionService.Instance.GetControlDiagnostics()),
+                    audio = Numbers(audio), audioError = ErrorKind(audio?.LastError),
+                    gamepad = Numbers(gamepad), gamepadError = ErrorKind(gamepad?.LastError)
+                }),
+                ["README.txt"] = "Pacote local. Nenhum envio automático. UTC permite comparar os dois computadores. errors.jsonl inclui execuções anteriores dentro da retenção. Ausência de erro não comprova ausência de falha. Falhas de energia, kernel ou driver podem impedir o registro final. dropped no manifesto inclui descarte por retenção; não equivale a perda de rede."
+            };
+            string path = await _flight.ExportAsync(JsonSerializer.Serialize(new {
+            format = "leveling-diagnostics-v3", instance = _instanceId, reportId, version = BuildInfo.DisplayVersion,
             utc = DateTimeOffset.UtcNow, managedSha256 = hashes.Managed, nativeSha256 = hashes.Native,
             runtime = RuntimeInformation.FrameworkDescription, architecture = RuntimeInformation.ProcessArchitecture.ToString(),
             os = Environment.OSVersion.VersionString, dropped = DroppedEntries,
-            lastReason = LastReason, lastWriteError = LastWriteError,
+            lastReason = LastReason, lastWriteError = ErrorKind(LastWriteError),
             privacy = "numeric/state telemetry only; endpoints keyed-hashed; no media, inputs or pairing codes"
-        })).ConfigureAwait(false);
+        }), attachments).ConfigureAwait(false);
+            LastReportSummary = summary;
+            return path;
+            }).ConfigureAwait(false);
         }
         public void Dispose() => _flight.Dispose();
     }

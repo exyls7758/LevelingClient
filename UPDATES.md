@@ -54,3 +54,11 @@ O timeout 0x80070102 do acesso sincronizado ao decoder é tratado como contenç�
 O núcleo Release usa CRT estática (/MT). Test-NativeDeployment.ps1 verifica os imports PE da DLL e rejeita runtime VC++ externo ou imports obrigatórios dos drivers NVIDIA. Os drivers NVIDIA continuam opcionais para o receptor Windows; isso não adiciona encoder Intel ao host.
 
 A liberação assíncrona da superfície também tem orçamento finito (dez tentativas, intervalo de 100 ms) e verifica a identidade do decoder antes de cada tentativa. Falha persistente não é convertida em liberação bem-sucedida.
+
+## Central de problemas na RC10
+
+Diagnóstico → Relatar um problema permite escolher a área e gerar um ZIP unificado. O pacote mantém o histórico de vídeo/rede existente e acrescenta report.json, summary.txt, README.txt e errors.jsonl. Estados numéricos de áudio e controle entram nas amostras quando os serviços já existem. A categoria selecionada não é um diagnóstico automático da causa.
+
+ProblemJournal guarda somente categoria, UTC, tipo, HResult e métodos do aplicativo para exceções encaminhadas a StartupDiagnostics.RecordException. Não persiste Message, Data, caminhos de código ou detalhes arbitrários. Dois arquivos rotativos limitam o histórico a aproximadamente 2 MB. Falhas de gravação não substituem a exceção original. Não captura toda falha silenciosa nem garante registro após travamento do sistema.
+
+O GitHub recebe apenas um rascunho de resumo após revisão e abertura no navegador. O usuário precisa publicar a issue; o ZIP permanece local. Nenhum token GitHub é incorporado ao aplicativo. A análise pelo Codex continua dependendo de uma solicitação no chat e do acesso ao relato/ZIP.

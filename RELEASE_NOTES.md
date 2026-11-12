@@ -1,9 +1,10 @@
-# Leveling 11.75.1-rc.9
+# Leveling 11.75.1-rc.10
 
-- Uma espera temporária pelo decoder durante ajuste da janela não interrompe imediatamente o transmissor. O cliente preserva a superfície e tenta novamente por até três segundos.
-- Falhas de apresentação só são comunicadas como definitivas ao host após as tentativas locais limitadas de recuperação.
-- Liberação da superfície tenta novamente de forma assíncrona quando o decoder ainda está ocupado, sem liberar recursos ou trocar de sessão prematuramente.
-- Runtime C++ incorporado ao núcleo para evitar a dependência externa das DLLs de runtime na instalação portátil.
-- Diagnósticos de inicialização passam a registrar a etapa e o status nativo numericamente.
+- Central Relatar um problema no Diagnóstico: categorias para vídeo, áudio, entrada, conexão e encerramentos.
+- Pacote único com histórico disponível, estados dos serviços, versão e resumo para comparar os dois PCs.
+- Histórico local limitado de tipos/códigos de exceções, preservado entre execuções, sem mensagens ou caminhos pessoais.
+- Copiar resumo e revisar um rascunho público no GitHub. Nenhum ZIP é enviado automaticamente.
 
-Não altera perfis, bitrate, FEC, pacing ou a prioridade NVDEC/NVENC em NVIDIA. Os testes locais não equivalem à validação entre dois computadores ou no notebook Intel.
+A coleta ajuda a investigar; não determina sozinha a causa nem garante registrar falhas de energia, kernel ou driver. Não altera encoder, decoder, bitrate, FEC ou pacing.
+
+- Botão Desconectar na janela remota libera a entrada e encerra a sessão sem fechar o launcher. Redimensionamento deixa de ser agendado após fechar a janela.

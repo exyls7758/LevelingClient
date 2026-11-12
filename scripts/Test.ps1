@@ -12,7 +12,7 @@ try {
  if($LASTEXITCODE -ne 0){throw 'Presenter regression build failed'}
  & ./tests/Presenter/bin/Presenter.exe
  if($LASTEXITCODE -ne 0){throw 'Presenter regression failed'}
- foreach($project in @('src/Leveling/tests/window-startup/Leveling.WindowRegression.csproj','tests/Connections/Connections.Tests.csproj','tests/Audio/Audio.Tests.csproj','tests/Updates/Updates.Tests.csproj','src/Leveling/tests/managed/Leveling.CoreRegression.csproj','src/Leveling/tests/desktop-input-service/InputSession.Tests.csproj')) {
+ foreach($project in @('tests/Problems/Problems.Tests.csproj','src/Leveling/tests/window-startup/Leveling.WindowRegression.csproj','tests/Connections/Connections.Tests.csproj','tests/Audio/Audio.Tests.csproj','tests/Updates/Updates.Tests.csproj','src/Leveling/tests/managed/Leveling.CoreRegression.csproj','src/Leveling/tests/desktop-input-service/InputSession.Tests.csproj')) {
   dotnet run --project $project -c Release
   if($LASTEXITCODE -ne 0){throw "Tests failed: $project"}
  }

@@ -168,7 +168,33 @@ namespace Multiverse.Services
                 if(DesktopInputService.Instance.IsCapturing)DesktopInputService.Instance.Release();
                 else DesktopInputService.Instance.BeginCapture();
             };
-            inputBar.Children.Add(_inputButton);inputBar.Children.Add(hint);
+            var disconnectButton = new Button { Content = "Desconectar",
+                HorizontalAlignment = HorizontalAlignment.Right };
+            disconnectButton.Click += async (_, _) =>
+            {
+                disconnectButton.IsEnabled = false;
+                try
+                {
+                    DesktopInputService.Instance.Release();
+                    await _session.DisconnectAsync();
+                    await CloseAsync();
+                }
+                catch (Exception ex)
+                {
+                    StartupDiagnostics.RecordException("CLIENT_DISCONNECT_ERROR", ex);
+                    if (IsOpen)
+                    {
+                        _presentationStatus.Text = "Não foi possível concluir a desconexão. Tente novamente.";
+                        _presentationStatus.Visibility = Visibility.Visible;
+                        disconnectButton.IsEnabled = true;
+                    }
+                }
+            };
+            var sessionActions = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 8,
+                HorizontalAlignment = HorizontalAlignment.Right };
+            sessionActions.Children.Add(_inputButton);
+            sessionActions.Children.Add(disconnectButton);
+            inputBar.Children.Add(sessionActions);inputBar.Children.Add(hint);
             _root.Children.Add(inputBar);
             _inputHint=hint;
             _root.Children.Add(_hudBorder);
@@ -603,7 +629,7 @@ namespace Multiverse.Services
 
         private void ScheduleResize()
         {
-            if (_disposed)
+            if (_disposed || !IsOpen)
                 return;
             // Coalesce an interactive resize. The native presenter must not
             // be stopped/restarted for every intermediate XAML size event.
@@ -620,7 +646,7 @@ namespace Multiverse.Services
         private void AttachOrResize()
         {
             NativeNvdecPlayer? decoder = _decoder;
-            if (_disposed || decoder is null || !decoder.Running)
+            if (_disposed || !IsOpen || decoder is null || !decoder.Running)
                 return;
 
             double scale = _root.XamlRoot?.RasterizationScale ?? 1.0;
@@ -753,6 +779,7 @@ namespace Multiverse.Services
             _isFullScreen = false;
             _cursorTimer.Stop();
             _hudTimer.Stop();
+            _resizeTimer.Stop();
             _hudBorder.Visibility = Visibility.Collapsed;
             _cursorVisual.Visibility = Visibility.Collapsed;
             bool detached = DetachRendererCore();

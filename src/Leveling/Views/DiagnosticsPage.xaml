@@ -17,6 +17,23 @@
                     <TextBlock Text="Telemetria somente de leitura. O nível configurado controla quanto o Leveling coleta e exibe aqui." Foreground="#8F9CA8" FontSize="12" TextWrapping="Wrap" Margin="0,6,0,0"/>
                 </StackPanel>
                 <Border Style="{StaticResource Card}">
+                    <StackPanel Spacing="10">
+                        <TextBlock Text="Relatar um problema" FontSize="18" FontWeight="SemiBold"/>
+                        <TextBlock Text="Um pacote com o histórico disponível, estados dos serviços e erros registrados. Gere nos dois PCs logo após a falha." Foreground="#B9C2C9" TextWrapping="Wrap"/>
+                        <ComboBox x:Name="ReportCategory" Header="Onde aconteceu?" SelectedIndex="0" MinWidth="260">
+                            <ComboBoxItem Content="Geral"/><ComboBoxItem Content="Vídeo"/><ComboBoxItem Content="Áudio"/><ComboBoxItem Content="Teclado, mouse e controle"/><ComboBoxItem Content="Conexão"/><ComboBoxItem Content="Travamento ou encerramento"/>
+                        </ComboBox>
+                        <StackPanel Orientation="Horizontal" Spacing="10">
+                            <Button x:Name="ExportDiagnosticsButton" Content="Gerar pacote (.zip)" Click="ExportDiagnostics_Click"/>
+                            <Button x:Name="CopySummaryButton" Content="Copiar resumo" Click="CopySummary_Click" IsEnabled="False"/>
+                            <Button x:Name="OpenGitHubReportButton" Content="Revisar para o GitHub" Click="OpenGitHubReport_Click" IsEnabled="False"/>
+                        </StackPanel>
+                        <TextBlock x:Name="ExportStatusText" Foreground="#B9C2C9" TextWrapping="Wrap"/>
+                        <TextBlock x:Name="RecorderStatusText" Foreground="#8F9CA8" FontSize="11" TextWrapping="Wrap"/>
+                        <TextBlock Text="Coleta local e limitada. Não grava imagem, áudio, teclas ou códigos de conexão. Nada é enviado automaticamente; no GitHub, somente o resumo revisado vira um rascunho público." Foreground="#8F9CA8" FontSize="11" TextWrapping="Wrap"/>
+                    </StackPanel>
+                </Border>
+                <Border Style="{StaticResource Card}">
                     <StackPanel Spacing="7">
                         <TextBlock Text="INICIALIZAÇÃO / ERROS" Foreground="#E62D4F" FontSize="10" FontWeight="SemiBold"/>
                         <TextBlock x:Name="StartupStatusText" Foreground="#B9C2C9" FontSize="10" TextWrapping="Wrap"/>
@@ -98,15 +115,7 @@
                         </StackPanel>
                     </Border>
                 </Grid>
-                <Border Style="{StaticResource Card}" BorderBrush="#303B45">
-                    <StackPanel Spacing="9">
-                        <TextBlock Text="REGISTRO AUTOMÁTICO DE INCIDENTES" Foreground="#E62D4F" FontSize="10" FontWeight="SemiBold"/>
-                        <TextBlock Text="O Leveling registra travadinhas e congelamentos automaticamente, mesmo com esta página fechada. Não grava imagem, áudio, teclas ou códigos de conexão." Foreground="#B9C2C9" FontSize="11" TextWrapping="Wrap"/>
-                        <TextBlock x:Name="RecorderStatusText" Foreground="#8F9CA8" FontSize="10" TextWrapping="Wrap"/>
-                        <Button x:Name="ExportDiagnosticsButton" Content="Exportar diagnóstico (.zip)" Click="ExportDiagnostics_Click" HorizontalAlignment="Left" Padding="18,10"/>
-                        <TextBlock x:Name="ExportStatusText" Foreground="#B9C2C9" FontSize="10" TextWrapping="Wrap"/>
-                    </StackPanel>
-                </Border>
+
                 <Border Style="{StaticResource Card}" Background="#1C252D">
                     <StackPanel Spacing="4">
                         <TextBlock x:Name="DiagnosticsModeText" Text="Nível: básico" Foreground="#E62D4F" FontSize="10" FontWeight="SemiBold"/>
